@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+  db:
+    image: mysql:8.0 
+    environment:
+      MYSQL_DATABASE: 'cursos'
+      MYSQL_USER: 'yo' 
+      MYSQL_PASSWORD: 'admin' 
+      MYSQL_ROOT_PASSWORD: 'admin' 
+    ports:
+      - '3306:3306'
+    volumes:
+      - db_data:/var/lib/mysql
+
+  api:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile  
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 
+    ports:
+      - '8000:8000'
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+
+volumes:
+  db_data:
