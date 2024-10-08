@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
 from ..database.db import Base
@@ -14,5 +14,7 @@ class Parallel(Base):
     jornada = Column(String(255))
     Campus = Column(String(255))
     sala = Column(String(255))
+    is_deleted = Column(Boolean, default=False)
+
 
     course = relationship("Course", back_populates="parallels") 
