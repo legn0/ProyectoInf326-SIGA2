@@ -8,10 +8,17 @@ services:
       MYSQL_USER: 'yo' 
       MYSQL_PASSWORD: 'admin' 
       MYSQL_ROOT_PASSWORD: 'admin' 
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 30s
+      retries: 10
+      start_period: 30s
     ports:
       - '3306:3306'
     volumes:
       - db_data:/var/lib/mysql
+
 
   api:
     build: 
@@ -23,7 +30,8 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
   db_data:
