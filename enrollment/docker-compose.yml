@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  # Cambia esto si deseas una contraseña diferente para el usuario root
+      MYSQL_DATABASE: enrollment_db      # La base de datos que se creará automáticamente
+      MYSQL_USER: myuser                 # El nombre de usuario que tú defines
+      MYSQL_PASSWORD: mypassword         # La contraseña del usuario que defines
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  enrollment-service:
+    build: .
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=mysql+pymysql://myuser:mypassword@db/enrollment_db
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:
