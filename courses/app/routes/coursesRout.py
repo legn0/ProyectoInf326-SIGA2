@@ -5,8 +5,6 @@ from ..database.db import get_db
 
 from ..models import coursesModel
 from ..schemas import coursesSchemas
-from ..models import parallelsModel
-from ..schemas import parallelsSchemas 
 
 router = APIRouter(
     prefix="/api/v1/courses",
