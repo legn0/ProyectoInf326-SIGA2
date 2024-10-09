@@ -10,7 +10,7 @@ class Course(Base):
     name = Column(String(255), unique=True, index=True) 
     description = Column(String(255))
     sigla = Column(String(255), unique=True, index=True)
-    departamento = Column(String(255), unique=True, index=True)
-    prerequisites = Column(String(255))
+    departamento = Column(String(255), index=True)
+    prerequisites = Column(String(255), nullable=True)
     # relationships
     parallels = relationship("Parallel", back_populates="course")

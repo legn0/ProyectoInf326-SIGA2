@@ -13,6 +13,6 @@ class CourseCreate(CourseBase):
 
 class Course(CourseBase):
     id: int
-
+    prerequisites: str | None = None
     class Config:
         from_attributes = True 
