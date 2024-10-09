@@ -12,6 +12,9 @@ class ParallelBase(BaseModel):
 class ParallelCreate(ParallelBase):
     pass
 
+# Agregar ParallelUpdate
+class ParallelUpdate(BaseModel):
+    name: str | None = None 
 class Parallel(ParallelBase):
     id: int
 
