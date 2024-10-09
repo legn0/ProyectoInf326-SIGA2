@@ -4,7 +4,10 @@ from sqlalchemy.orm import Session
 from ..database.db import get_db 
 
 from ..models import coursesModel
-from ..schemas import coursesSchemas
+from ..schemas import coursesSchemas 
+
+from ..rabbit.rabbitPublisher import get_rabbit_channel
+from ..rabbit.parallelsRabbitFunctions import *
 
 router = APIRouter(
     prefix="/api/v1/courses",
@@ -12,9 +15,10 @@ router = APIRouter(
     tags=["Courses"]
 )
 
-@router.get("/", response_model=list[coursesSchemas.Course]) #Lista de courses
-def get_courses(db: Session = Depends(get_db)):
+@router.get("/", response_model=list[coursesSchemas.Course])
+def get_courses(db: Session = Depends(get_db), channel: BlockingChannel = Depends(get_rabbit_channel)):
     courses = db.query(coursesModel.Course).all()
+    publishUpdatedParallel(channel=channel, course_id=20, course_name="CC", parallel_id=10)
     return courses
 
 @router.get("/{id}", response_model=coursesSchemas.Course) #course por id
