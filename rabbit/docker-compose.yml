@@ -1,6 +1,10 @@
+networks:
+  rabbitmq:
+    name: rabbitmq
+
 services:
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:3-management
     container_name: rabbitmq
     healthcheck:
       test: rabbitmq-diagnostics check_port_connectivity
@@ -10,3 +14,7 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+
+    networks:
+      - rabbitmq
+
