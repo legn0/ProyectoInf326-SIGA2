@@ -38,27 +38,46 @@ def create_parallel(course_id: int, parallel: parallelsSchemas.ParallelCreate, d
 
 # Actualizar un paralelo
 @router.put("/{parallel_id}", response_model=parallelsSchemas.Parallel)
-def update_parallel(course_id: int, parallel_id: int, parallel: parallelsSchemas.ParallelUpdate, db: Session = Depends(get_db)):
+def update_parallel(course_id: int, parallel_id: int, parallel: parallelsSchemas.ParallelUpdate, db: Session = Depends(get_db), channel: BlockingChannel = Depends(get_rabbit_channel)):
     db_parallel = db.query(parallelsModel.Parallel).filter(parallelsModel.Parallel.id == parallel_id, parallelsModel.Parallel.course_id == course_id).first()
     if not db_parallel:
         raise HTTPException(status_code=404, detail="Parallel not found")
+
+    db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == course_id).first()
+    if not db_course:
+        raise HTTPException(status_code=404, detail="Course not found")
 
     for key, value in parallel.dict(exclude_unset=True).items():
         setattr(db_parallel, key, value)
 
     db.commit()
     db.refresh(db_parallel)
+
+    publishUpdatedParallel(channel = channel,
+                           course_id=course_id,
+                           course_name=db_course.name,
+                           parallel_id=parallel_id,
+                           **parallel.dict(exclude_unset=True) 
+                           )
     return db_parallel
 
 # Eliminar un paralelo
 @router.delete("/{parallel_id}")
-def delete_parallel(course_id: int, parallel_id: int, db: Session = Depends(get_db)):
+def delete_parallel(course_id: int, parallel_id: int, db: Session = Depends(get_db),channel: BlockingChannel = Depends(get_rabbit_channel)):
+    db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == course_id).first()
+    if not db_course:
+        raise HTTPException(status_code=404, detail="Course not found")
+
     db_parallel = db.query(parallelsModel.Parallel).filter(parallelsModel.Parallel.id == parallel_id, parallelsModel.Parallel.course_id == course_id).first()
     if not db_parallel:
         raise HTTPException(status_code=404, detail="Parallel not found")
 
     db.delete(db_parallel)
     db.commit()
+    publishDeletedParallel(channel = channel,
+                           parallel_id=parallel_id,
+                           course_id=course_id,
+                           course_name=db_course.name)
     return {"message": "Parallel deleted successfully"}
 
 # Consultar un paralelo

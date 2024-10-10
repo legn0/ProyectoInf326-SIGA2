@@ -23,18 +23,18 @@ def publishNewParallel(course_id: int, course_name: str, parallel_id: int, paral
 
 def publishUpdatedParallel( channel: BlockingChannel,
                             course_id: int, course_name: str,
-                            parallel_id: int, parallel_number: int = None,
-                            limite_cupo: int = None, jornada: int = None, campus_sede: int = None):
+                            parallel_id: int, number: int = None,
+                            limite_cupo: int = None, jornada: int = None, Campus: int = None):
 
     body ={
         "curso" : {
             "id" : course_id,
             "name": course_name}
         }
-    if parallel_number != None: body["numero"] = parallel_number
+    if number != None: body["numero"] = number
     if limite_cupo != None: body["limite_cupo"] = limite_cupo
     if jornada != None: body["jornada"] = jornada
-    if campus_sede != None: body["campus_sede"] = campus_sede
+    if Campus != None: body["campus_sede"] = Campus
 
     channel.basic_publish(
         exchange="courses",

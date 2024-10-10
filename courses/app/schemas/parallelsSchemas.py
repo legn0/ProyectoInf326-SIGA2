@@ -11,7 +11,10 @@ class ParallelCreate(ParallelBase):
 
 # Agregar ParallelUpdate
 class ParallelUpdate(BaseModel):
-    name: str | None = None 
+    number: int | None = None
+    limite_cupo: int | None = None
+    jornada: int | None = None
+    Campus: int | None = None
 class Parallel(ParallelBase):
     id: int
 
