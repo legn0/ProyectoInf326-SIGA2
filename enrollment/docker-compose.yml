@@ -9,13 +9,13 @@ services:
       MYSQL_USER: myuser                 # El nombre de usuario que tú defines
       MYSQL_PASSWORD: mypassword         # La contraseña del usuario que defines
     ports:
-      - "3306:3306"
+      - "3300:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
   enrollment-service:
     build: .
-    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     ports:
       - "8000:8000"
     environment:
