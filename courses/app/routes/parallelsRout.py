@@ -6,14 +6,18 @@ from ..database.db import get_db
 from ..models import parallelsModel, coursesModel
 from ..schemas import parallelsSchemas
 
+from ..rabbit.rabbitPublisher import get_rabbit_channel
+from pika.adapters.blocking_connection import BlockingChannel
+from ..rabbit.parallelsRabbitFunctions import *
+
 router = APIRouter(
-    prefix="/courses/{course_id}/parallels",
+    prefix="/api/v1/courses/{course_id}/parallels",
     tags=["Parallels"]
 )
 
 # Crear un paralelo
 @router.post("/", response_model=parallelsSchemas.Parallel, status_code=status.HTTP_201_CREATED)
-def create_parallel(course_id: int, parallel: parallelsSchemas.ParallelCreate, db: Session = Depends(get_db)):
+def create_parallel(course_id: int, parallel: parallelsSchemas.ParallelCreate, db: Session = Depends(get_db), channel: BlockingChannel = Depends(get_rabbit_channel)):
     db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == course_id).first()
     if not db_course:
         raise HTTPException(status_code=404, detail="Course not found")
@@ -22,6 +26,14 @@ def create_parallel(course_id: int, parallel: parallelsSchemas.ParallelCreate, d
     db.add(db_parallel)
     db.commit()
     db.refresh(db_parallel)
+    publishNewParallel(course_id=course_id,
+                        course_name=db_course.name,
+                        parallel_id=db_parallel.id,
+                        parallel_number=db_parallel.number,
+                        limite_cupo=db_parallel.limite_cupo,
+                        jornada=db_parallel.jornada,
+                        campus_sede=db_parallel.Campus,
+                        channel=channel)
     return db_parallel
 
 # Actualizar un paralelo

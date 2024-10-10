@@ -6,7 +6,7 @@ from ..database.db import Base
 class Course(Base):
     __tablename__ = "courses"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String(255), unique=True, index=True)
     sigla = Column(String(255), unique=True, index=True)
     departamento = Column(String(255), index=True)

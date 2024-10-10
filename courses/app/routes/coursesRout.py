@@ -7,7 +7,8 @@ from ..models import coursesModel
 from ..schemas import coursesSchemas 
 
 from ..rabbit.rabbitPublisher import get_rabbit_channel
-from ..rabbit.parallelsRabbitFunctions import *
+
+from pika.adapters.blocking_connection import BlockingChannel
 
 router = APIRouter(
     prefix="/api/v1/courses",
@@ -18,7 +19,6 @@ router = APIRouter(
 @router.get("/", response_model=list[coursesSchemas.Course])
 def get_courses(db: Session = Depends(get_db), channel: BlockingChannel = Depends(get_rabbit_channel)):
     courses = db.query(coursesModel.Course).all()
-    publishUpdatedParallel(channel=channel, course_id=20, course_name="CC", parallel_id=10)
     return courses
 
 @router.get("/{id}", response_model=coursesSchemas.Course) #course por id

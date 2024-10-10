@@ -2,7 +2,6 @@ from pydantic import BaseModel
 
 class CourseBase(BaseModel):
     name: str
-    description: str
     sigla: str	
     departamento: str
     prerequisites: str

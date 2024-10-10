@@ -1,13 +1,10 @@
 from pydantic import BaseModel
 
 class ParallelBase(BaseModel):
-    name: str
-    course_id: int
     number: int
     limite_cupo: int
-    jornada: str
-    Campus: str
-    sala: str
+    jornada: int
+    Campus: int
 
 class ParallelCreate(ParallelBase):
     pass
