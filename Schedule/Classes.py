@@ -1,10 +1,7 @@
 from pydantic import BaseModel
 
-class HorarioParalelo(BaseModel):
-    siglacurso: str
-    paralelo: int
-    dia: str
-    bloqueinicio: int
-    bloquefinal: int
-
+class Horario(BaseModel):
+    nombre_bloque: str | None = None
+    id_bloque: int | None = None
+    tipo_bloque: str | None = None
 
