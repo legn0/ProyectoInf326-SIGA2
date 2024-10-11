@@ -22,13 +22,10 @@ def publishCreateCourse(course_name: str, sigla: str, creditos: int, departament
                             routing_key=f"course.{course_id}.created",
                             body=json.dumps(body)
                             )
-    except (pkex.StreamLostError, pkex.ChannelClosed, pkex.ChannelWrongStateError, pkex.ConnectionClosed, pkex.ConnectionWrongStateError):
+    except:
         time.sleep(2)
-        create_rabbit_connection()
-        channel.basic_publish(exchange="courses",
-                            routing_key=f"course.{course_id}.created",
-                            body=json.dumps(body)
-        )
+        chan = create_rabbit_connection()
+        publishCreateCourse(course_name, sigla, creditos, departamento, prerequisitos, course_id, chan)
 
 def publishUpdatedCourse(channel: BlockingChannel, 
                          course_id: int,
@@ -54,14 +51,10 @@ def publishUpdatedCourse(channel: BlockingChannel,
             routing_key=f"course.{course_id}.updated",
             body=json.dumps(body)
         )
-    except (pkex.StreamLostError, pkex.ChannelClosed, pkex.ChannelWrongStateError, pkex.ConnectionClosed, pkex.ConnectionWrongStateError):
+    except:
         time.sleep(2)
-        create_rabbit_connection()
-        channel.basic_publish(
-            exchange="courses",
-            routing_key=f"course.{course_id}.updated",
-            body=json.dumps(body)
-        )
+        chan = create_rabbit_connection()
+        publishUpdatedCourse(chan, course_id, name, sigla, creditos, departamento, prerequisites)
     
 
 def publishDeletedCourse(channel: BlockingChannel,
@@ -74,12 +67,8 @@ def publishDeletedCourse(channel: BlockingChannel,
             routing_key=f"course.{course_id}.deleted",
             body=json.dumps(body)
         )
-    except (pkex.StreamLostError, pkex.ChannelClosed, pkex.ChannelWrongStateError, pkex.ConnectionClosed, pkex.ConnectionWrongStateError):
+    except:
         time.sleep(2)
-        create_rabbit_connection()
-        channel.basic_publish(
-            exchange="courses",
-            routing_key=f"course.{course_id}.deleted",
-            body=json.dumps(body)
-        )   
+        chan = create_rabbit_connection()
+        publishDeletedCourse(chan, course_id)   
   

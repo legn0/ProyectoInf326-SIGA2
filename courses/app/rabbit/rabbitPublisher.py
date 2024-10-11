@@ -62,6 +62,7 @@ def create_rabbit_connection():
             create_rabbit_connection_aux(tries=tries+1)     
     
     create_rabbit_connection_aux(0)
+    return rabbit_channel
 
 def close_rabbit_connection():
     '''
