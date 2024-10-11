@@ -27,7 +27,7 @@ def get_courses(db: Session = Depends(get_db), channel: BlockingChannel = Depend
 def get_course(id: int, db: Session = Depends(get_db)):
 
     course = db.query(coursesModel.Course).filter(coursesModel.Course.id == id).first()
-    if not course:
+    if not course or course.is_deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Course not found")
     return course
 
@@ -49,7 +49,7 @@ def create_course(course: coursesSchemas.CourseCreate, db: Session = Depends(get
 @router.put("/{id}", response_model=coursesSchemas.Course) #Actualizar course
 def update_course(id: int, course: coursesSchemas.CourseUpdate, db: Session = Depends(get_db), channel: BlockingChannel = Depends(get_rabbit_channel)):
     db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == id)
-    if not db_course.first():
+    if not db_course or db_course.is_deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Course not found")
     db_course.update(course.dict(), synchronize_session=False)
     db.commit()
@@ -60,12 +60,12 @@ def update_course(id: int, course: coursesSchemas.CourseUpdate, db: Session = De
 
 @router.delete("/{id}", response_model=coursesSchemas.Course) #Eliminar course
 def delete_course(id: int, db: Session = Depends(get_db), channel: BlockingChannel = Depends(get_rabbit_channel)):
-    db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == id)
-    if not db_course.first():
+    db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == id).first()
+    if not db_course:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Course not found")
-    publishDeletedCourse(channel=channel,
-                         course_id=db_course.first().id)
-    db_course.delete()
+    publishDeletedCourse(channel=channel,course_id=db_course.id)
+    db_course.is_deleted = True
     db.commit()
+    db.refresh(db_course)
     
-    return db_course.first()
+    return db_course

@@ -19,7 +19,7 @@ router = APIRouter(
 @router.post("/", response_model=parallelsSchemas.Parallel, status_code=status.HTTP_201_CREATED)
 def create_parallel(course_id: int, parallel: parallelsSchemas.ParallelCreate, db: Session = Depends(get_db), channel: BlockingChannel = Depends(get_rabbit_channel)):
     db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == course_id).first()
-    if not db_course:
+    if not db_course or db_course.is_deleted:
         raise HTTPException(status_code=404, detail="Course not found")
 
     db_parallel = parallelsModel.Parallel(**parallel.dict(), course_id=course_id)
@@ -71,20 +71,20 @@ def delete_parallel(course_id: int, parallel_id: int, db: Session = Depends(get_
     db_parallel = db.query(parallelsModel.Parallel).filter(parallelsModel.Parallel.id == parallel_id, parallelsModel.Parallel.course_id == course_id).first()
     if not db_parallel:
         raise HTTPException(status_code=404, detail="Parallel not found")
-
-    db.delete(db_parallel)
-    db.commit()
     publishDeletedParallel(channel = channel,
                            parallel_id=parallel_id,
                            course_id=course_id,
                            course_name=db_course.name)
+    db_parallel.is_deleted = True
+    db.commit()
+    db.refresh(db_parallel)
     return {"message": "Parallel deleted successfully"}
 
 # Consultar un paralelo
 @router.get("/{parallel_id}", response_model=parallelsSchemas.Parallel)
 def get_parallel(course_id: int, parallel_id: int, db: Session = Depends(get_db)):
     db_parallel = db.query(parallelsModel.Parallel).filter(parallelsModel.Parallel.id == parallel_id, parallelsModel.Parallel.course_id == course_id).first()
-    if not db_parallel:
+    if not db_parallel or db_parallel.is_deleted:
         raise HTTPException(status_code=404, detail="Parallel not found")
 
     return db_parallel
@@ -92,5 +92,5 @@ def get_parallel(course_id: int, parallel_id: int, db: Session = Depends(get_db)
 # Listar todos los paralelos de un curso
 @router.get("/", response_model=List[parallelsSchemas.Parallel])
 def get_parallels(course_id: int, db: Session = Depends(get_db)):
-    db_parallels = db.query(parallelsModel.Parallel).filter(parallelsModel.Parallel.course_id == course_id).all()
+    db_parallels = db.query(parallelsModel.Parallel).filter(parallelsModel.Parallel.course_id == course_id, parallelsModel.Parallel.is_deleted == False).all()
     return db_parallels
