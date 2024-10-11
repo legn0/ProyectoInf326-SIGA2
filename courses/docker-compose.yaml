@@ -7,10 +7,10 @@ services:
   db:
     image: mysql:8.0 
     environment:
-      MYSQL_DATABASE: 'cursos'
-      MYSQL_USER: 'yo' 
-      MYSQL_PASSWORD: 'admin' 
-      MYSQL_ROOT_PASSWORD: 'admin' 
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER} 
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -18,7 +18,7 @@ services:
       retries: 10
       start_period: 30s
     ports:
-      - '3306:3306'
+      - ${MYSQL_PORT}:3306
     volumes:
       - db_data:/var/lib/mysql
     networks:
@@ -31,7 +31,7 @@ services:
       dockerfile: ./Dockerfile  
     command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 
     ports:
-      - 8000:8000
+      - ${API_PORT}:8000
     volumes:
       - .:/app
     depends_on:
