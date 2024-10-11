@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, DateTime, Boolean
+from sqlalchemy.sql import func
 from database import Base
 
 class Enrollment(Base):
@@ -9,3 +9,5 @@ class Enrollment(Base):
     student_id = Column(Integer, index=True)
     parallel_id = Column(Integer, index=True)
     course_id = Column(Integer, index=True)
+    created_at = Column(DateTime, default=func.now())
+    is_active = Column(Boolean, default=True)
