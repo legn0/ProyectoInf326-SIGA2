@@ -18,6 +18,23 @@ router = APIRouter(
 # Crear un paralelo
 @router.post("/", response_model=parallelsSchemas.Parallel, status_code=status.HTTP_201_CREATED)
 def create_parallel(course_id: int, parallel: parallelsSchemas.ParallelCreate, db: Session = Depends(get_db), channel: BlockingChannel = Depends(get_rabbit_channel)):
+    """
+    Crea un nuevo paralelo para un curso específico.
+
+    Args:
+        course_id (int): El ID del curso al que pertenece el paralelo.
+        parallel (ParallelCreate): Los datos del paralelo que se va a crear.
+        db (Session): La sesión de base de datos proporcionada por la dependencia `get_db`.
+        channel (BlockingChannel): El canal de RabbitMQ proporcionado por la dependencia `get_rabbit_channel`.
+
+    Returns:
+        Parallel: El paralelo recién creado.
+
+    Raises:
+        HTTPException: Si el curso no se encuentra.
+
+    Este endpoint permite crear un nuevo paralelo y luego publica un mensaje en RabbitMQ indicando que el paralelo fue creado.
+    """
     db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == course_id).first()
     if not db_course or db_course.is_deleted:
         raise HTTPException(status_code=404, detail="Course not found")
@@ -39,6 +56,24 @@ def create_parallel(course_id: int, parallel: parallelsSchemas.ParallelCreate, d
 # Actualizar un paralelo
 @router.put("/{parallel_id}", response_model=parallelsSchemas.Parallel)
 def update_parallel(course_id: int, parallel_id: int, parallel: parallelsSchemas.ParallelUpdate, db: Session = Depends(get_db), channel: BlockingChannel = Depends(get_rabbit_channel)):
+    """
+    Actualiza un paralelo existente para un curso específico.
+
+    Args:
+        course_id (int): El ID del curso al que pertenece el paralelo.
+        parallel_id (int): El ID del paralelo que se va a actualizar.
+        parallel (ParallelUpdate): Los nuevos datos del paralelo.
+        db (Session): La sesión de base de datos proporcionada por la dependencia `get_db`.
+        channel (BlockingChannel): El canal de RabbitMQ proporcionado por la dependencia `get_rabbit_channel`.
+
+    Returns:
+        Parallel: El paralelo actualizado.
+
+    Raises:
+        HTTPException: Si no se encuentra el curso o el paralelo.
+
+    Este endpoint actualiza un paralelo existente y luego publica un mensaje en RabbitMQ indicando que el paralelo fue actualizado.
+    """
     db_parallel = db.query(parallelsModel.Parallel).filter(parallelsModel.Parallel.id == parallel_id, parallelsModel.Parallel.course_id == course_id).first()
     if not db_parallel:
         raise HTTPException(status_code=404, detail="Parallel not found")
@@ -64,6 +99,23 @@ def update_parallel(course_id: int, parallel_id: int, parallel: parallelsSchemas
 # Eliminar un paralelo
 @router.delete("/{parallel_id}")
 def delete_parallel(course_id: int, parallel_id: int, db: Session = Depends(get_db),channel: BlockingChannel = Depends(get_rabbit_channel)):
+    """
+    Elimina un paralelo existente de un curso.
+
+    Args:
+        course_id (int): El ID del curso al que pertenece el paralelo.
+        parallel_id (int): El ID del paralelo que se va a eliminar.
+        db (Session): La sesión de base de datos proporcionada por la dependencia `get_db`.
+        channel (BlockingChannel): El canal de RabbitMQ proporcionado por la dependencia `get_rabbit_channel`.
+
+    Returns:
+        dict: Un mensaje indicando que el paralelo fue eliminado.
+
+    Raises:
+        HTTPException: Si no se encuentra el curso o el paralelo.
+
+    Este endpoint elimina un paralelo y publica un mensaje en RabbitMQ indicando que el paralelo fue eliminado.
+    """
     db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == course_id).first()
     if not db_course:
         raise HTTPException(status_code=404, detail="Course not found")
@@ -83,6 +135,22 @@ def delete_parallel(course_id: int, parallel_id: int, db: Session = Depends(get_
 # Consultar un paralelo
 @router.get("/{parallel_id}", response_model=parallelsSchemas.Parallel)
 def get_parallel(course_id: int, parallel_id: int, db: Session = Depends(get_db)):
+    """
+    Obtiene un paralelo específico de un curso.
+
+    Args:
+        course_id (int): El ID del curso al que pertenece el paralelo.
+        parallel_id (int): El ID del paralelo que se desea consultar.
+        db (Session): La sesión de base de datos proporcionada por la dependencia `get_db`.
+
+    Returns:
+        Parallel: El paralelo encontrado.
+
+    Raises:
+        HTTPException: Si no se encuentra el curso o el paralelo.
+
+    Este endpoint obtiene los detalles de un paralelo específico de un curso.
+    """
     db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == course_id).first()
     if not db_parallel or db_parallel.is_deleted:
         raise HTTPException(status_code=404, detail="Parallel not found")
@@ -94,6 +162,18 @@ def get_parallel(course_id: int, parallel_id: int, db: Session = Depends(get_db)
 # Listar todos los paralelos de un curso
 @router.get("/", response_model=List[parallelsSchemas.Parallel])
 def get_parallels(course_id: int, db: Session = Depends(get_db)):
+    """
+    Lista todos los paralelos de un curso.
+
+    Args:
+        course_id (int): El ID del curso cuyos paralelos se desean listar.
+        db (Session): La sesión de base de datos proporcionada por la dependencia `get_db`.
+
+    Returns:
+        List[Parallel]: Una lista de todos los paralelos asociados a un curso.
+
+    Este endpoint devuelve una lista de todos los paralelos asociados a un curso específico.
+    """
     db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == course_id).first()
     if not db_course or db_course.is_deleted:
         raise HTTPException(status_code=404, detail="Course not found")
