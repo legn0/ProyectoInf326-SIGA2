@@ -22,7 +22,7 @@ def publishCreateCourse(course_name: str, sigla: str, creditos: int, departament
                             routing_key=f"course.{course_id}.created",
                             body=json.dumps(body)
                             )
-    except pkex.StreamLostError:
+    except (pkex.StreamLostError, pkex.ChannelClosed, pkex.ChannelWrongStateError, pkex.ConnectionClosed, pkex.ConnectionWrongStateError):
         time.sleep(2)
         create_rabbit_connection()
         channel.basic_publish(exchange="courses",
@@ -54,7 +54,7 @@ def publishUpdatedCourse(channel: BlockingChannel,
             routing_key=f"course.{course_id}.updated",
             body=json.dumps(body)
         )
-    except pkex.StreamLostError:
+    except (pkex.StreamLostError, pkex.ChannelClosed, pkex.ChannelWrongStateError, pkex.ConnectionClosed, pkex.ConnectionWrongStateError):
         time.sleep(2)
         create_rabbit_connection()
         channel.basic_publish(
@@ -74,7 +74,7 @@ def publishDeletedCourse(channel: BlockingChannel,
             routing_key=f"course.{course_id}.deleted",
             body=json.dumps(body)
         )
-    except pkex.StreamLostError:
+    except (pkex.StreamLostError, pkex.ChannelClosed, pkex.ChannelWrongStateError, pkex.ConnectionClosed, pkex.ConnectionWrongStateError):
         time.sleep(2)
         create_rabbit_connection()
         channel.basic_publish(

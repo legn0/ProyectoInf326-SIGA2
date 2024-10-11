@@ -23,7 +23,7 @@ def publishNewParallel(course_id: int, course_name: str, parallel_id: int, paral
                             routing_key=f"parallel.{parallel_id}.created",
                             body=json.dumps(body)
                             )
-    except pkex.StreamLostError:
+    except (pkex.StreamLostError, pkex.ChannelClosed, pkex.ChannelWrongStateError, pkex.ConnectionClosed, pkex.ConnectionWrongStateError):
         time.sleep(2)
         create_rabbit_connection()
         channel.basic_publish(exchange="courses",
@@ -52,7 +52,7 @@ def publishUpdatedParallel( channel: BlockingChannel,
             routing_key=f"parallel.{parallel_id}.updated",
             body=json.dumps(body)
         )
-    except pkex.StreamLostError:
+    except (pkex.StreamLostError, pkex.ChannelClosed, pkex.ChannelWrongStateError, pkex.ConnectionClosed, pkex.ConnectionWrongStateError):
         time.sleep(2)
         create_rabbit_connection()
         channel.basic_publish(
@@ -75,7 +75,7 @@ def publishDeletedParallel(channel: BlockingChannel,
             routing_key=f"parallel.{parallel_id}.deleted",
             body=json.dumps(body)
         )
-    except pkex.StreamLostError:
+    except (pkex.StreamLostError, pkex.ChannelClosed, pkex.ChannelWrongStateError, pkex.ConnectionClosed, pkex.ConnectionWrongStateError):
         time.sleep(2)
         create_rabbit_connection()
         channel.basic_publish(

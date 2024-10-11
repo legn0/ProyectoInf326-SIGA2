@@ -50,7 +50,7 @@ def create_rabbit_connection():
         
         global rabbit_channel, rabbit_conn
         try: 
-            rabbit_conn = pk.BlockingConnection(pk.URLParameters(f"amqp://guest:guest@rabbitmq:5672")) #Coneccion con rabbit
+            rabbit_conn = pk.BlockingConnection(pk.URLParameters(f"amqp://guest:guest@rabbitmq:5672/%2f?heartbeat=240")) #Coneccion con rabbit
             rabbit_channel = rabbit_conn.channel()
             rabbit_channel.exchange_declare(exchange="courses", #Creacion de topico
                             exchange_type="topic"
