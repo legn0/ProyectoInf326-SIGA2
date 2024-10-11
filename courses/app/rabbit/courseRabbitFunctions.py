@@ -1,6 +1,9 @@
+import time
 import pika as pk
 import json
 from pika.adapters.blocking_connection import BlockingChannel
+import pika.exceptions as pkex
+from .rabbitPublisher import create_rabbit_connection
 
 def publishCreateCourse(course_name: str, sigla: str, creditos: int, departamento:str, prerequisitos: str, course_id: int,
                         channel: BlockingChannel):
@@ -14,11 +17,19 @@ def publishCreateCourse(course_name: str, sigla: str, creditos: int, departament
 
     }
 
-    channel.basic_publish(exchange="courses",
-                          routing_key=f"course.{course_id}.created",
-                          body=json.dumps(body)
-                          )
-    
+    try:
+        channel.basic_publish(exchange="courses",
+                            routing_key=f"course.{course_id}.created",
+                            body=json.dumps(body)
+                            )
+    except pkex.StreamLostError:
+        time.sleep(2)
+        create_rabbit_connection()
+        channel.basic_publish(exchange="courses",
+                            routing_key=f"course.{course_id}.created",
+                            body=json.dumps(body)
+        )
+
 def publishUpdatedCourse(channel: BlockingChannel, 
                          course_id: int,
                          name: str = None,
@@ -37,21 +48,38 @@ def publishUpdatedCourse(channel: BlockingChannel,
     if departamento != None: body["departamento"] = departamento
     if prerequisites != None: body["prerequisites"] = prerequisites
 
-    channel.basic_publish(
-        exchange="courses",
-        routing_key=f"course.{course_id}.updated",
-        body=json.dumps(body)
-    )
+    try:
+        channel.basic_publish(
+            exchange="courses",
+            routing_key=f"course.{course_id}.updated",
+            body=json.dumps(body)
+        )
+    except pkex.StreamLostError:
+        time.sleep(2)
+        create_rabbit_connection()
+        channel.basic_publish(
+            exchange="courses",
+            routing_key=f"course.{course_id}.updated",
+            body=json.dumps(body)
+        )
     
 
 def publishDeletedCourse(channel: BlockingChannel,
                            course_id: int):
     body = {}
 
-
-    channel.basic_publish(
-        exchange="courses",
-        routing_key=f"course.{course_id}.deleted",
-        body=json.dumps(body)
-    )   
+    try:
+        channel.basic_publish(
+            exchange="courses",
+            routing_key=f"course.{course_id}.deleted",
+            body=json.dumps(body)
+        )
+    except pkex.StreamLostError:
+        time.sleep(2)
+        create_rabbit_connection()
+        channel.basic_publish(
+            exchange="courses",
+            routing_key=f"course.{course_id}.deleted",
+            body=json.dumps(body)
+        )   
   
