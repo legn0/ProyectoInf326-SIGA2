@@ -1,6 +1,9 @@
+import time
 import pika as pk
 import json
 from pika.adapters.blocking_connection import BlockingChannel
+import pika.exceptions as pkex
+from .rabbitPublisher import create_rabbit_connection
 
 def publishNewParallel(course_id: int, course_name: str, parallel_id: int, parallel_number: int, limite_cupo: int, jornada: int, campus_sede: int,
                         channel: BlockingChannel):
@@ -15,11 +18,15 @@ def publishNewParallel(course_id: int, course_name: str, parallel_id: int, paral
         "campus_sede": campus_sede
     }
 
-    channel.basic_publish(exchange="courses",
-                          routing_key=f"parallel.{parallel_id}.created",
-                          body=json.dumps(body)
-                          )
-
+    try:
+        channel.basic_publish(exchange="courses",
+                            routing_key=f"parallel.{parallel_id}.created",
+                            body=json.dumps(body)
+                            )
+    except:
+        time.sleep(2)
+        chan = create_rabbit_connection()
+        publishNewParallel(course_id, course_name, parallel_id, parallel_number, limite_cupo, jornada, campus_sede, chan)
 
 def publishUpdatedParallel( channel: BlockingChannel,
                             course_id: int, course_name: str,
@@ -36,11 +43,17 @@ def publishUpdatedParallel( channel: BlockingChannel,
     if jornada != None: body["jornada"] = jornada
     if Campus != None: body["campus_sede"] = Campus
 
-    channel.basic_publish(
-        exchange="courses",
-        routing_key=f"parallel.{parallel_id}.updated",
-        body=json.dumps(body)
-    )
+    try:
+        channel.basic_publish(
+            exchange="courses",
+            routing_key=f"parallel.{parallel_id}.updated",
+            body=json.dumps(body)
+        )
+    except:
+        time.sleep(2)
+        chan = create_rabbit_connection()
+
+        publishUpdatedParallel(chan, course_id, course_name, parallel_id, number, limite_cupo, jornada, Campus)
 
 def publishDeletedParallel(channel: BlockingChannel,
                            parallel_id: int, course_id: int, course_name: str):
@@ -50,9 +63,13 @@ def publishDeletedParallel(channel: BlockingChannel,
             "id" : course_id,
             "name": course_name}
         }
-
-    channel.basic_publish(
-        exchange="courses",
-        routing_key=f"parallel.{parallel_id}.deleted",
-        body=json.dumps(body)
-    )
+    try:
+        channel.basic_publish(
+            exchange="courses",
+            routing_key=f"parallel.{parallel_id}.deleted",
+            body=json.dumps(body)
+        )
+    except:
+        time.sleep(2)
+        chan = create_rabbit_connection()
+        publishDeletedParallel(chan, parallel_id, course_id, course_name)
