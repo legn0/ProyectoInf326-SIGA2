@@ -7,6 +7,21 @@ from .rabbitPublisher import create_rabbit_connection
 
 def publishCreateCourse(course_name: str, sigla: str, creditos: int, departamento:str, prerequisitos: str, course_id: int,
                         channel: BlockingChannel):
+    '''
+    Publica un mensaje cuando se crea un nuevo curso.
+    Args:
+        course_name (str): El nombre del curso.
+        sigla (str): La sigla del curso
+        creditos (int): El número de créditos del curso.
+        departamento (str): El departamento al que pertenece el curso.
+        prerequisitos (str): Los prerequisitos del curso.
+        course_id (int): El ID único del curso.
+        channel (BlockingChannel): El canal de RabbitMQ para publicar el mensaje.
+
+    Returns:
+        None
+
+    '''
     body = {
         "name"          : course_name,
         "sigla"         : sigla,
@@ -34,6 +49,22 @@ def publishUpdatedCourse(channel: BlockingChannel,
                          creditos: int = None,
                          departamento: str = None,
                          prerequisites: str = None):
+    '''
+    Publica un mensaje cuando se actualiza curso.
+
+    Args:
+        channel (BlockingChannel): El canal de RabbitMQ para publicar el mensaje.
+        course_id (int): El ID único del curso.
+        name (str): El nombre del curso.
+        sigla (str): La sigla del curso
+        creditos (int): El número de créditos del curso.
+        departamento (str): El departamento al que pertenece el curso.
+        prerequisites (str): Los prerequisitos del curso.    
+
+    Returns:
+        None
+
+    '''
 
     body = {
 
@@ -59,6 +90,16 @@ def publishUpdatedCourse(channel: BlockingChannel,
 
 def publishDeletedCourse(channel: BlockingChannel,
                            course_id: int):
+    '''
+    Publica un mensaje cuando se elimina un curso.
+    Args:
+        channel (BlockingChannel): El canal de RabbitMQ para publicar el mensaje.
+        course_id (int): El ID único del curso.
+
+    Returns:
+        None
+
+    '''
     body = {}
 
     try:
