@@ -44,7 +44,7 @@ def update_parallel(course_id: int, parallel_id: int, parallel: parallelsSchemas
         raise HTTPException(status_code=404, detail="Parallel not found")
 
     db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == course_id).first()
-    if not db_course:
+    if not db_course or db_course.is_deleted:
         raise HTTPException(status_code=404, detail="Course not found")
 
     for key, value in parallel.dict(exclude_unset=True).items():
@@ -83,14 +83,19 @@ def delete_parallel(course_id: int, parallel_id: int, db: Session = Depends(get_
 # Consultar un paralelo
 @router.get("/{parallel_id}", response_model=parallelsSchemas.Parallel)
 def get_parallel(course_id: int, parallel_id: int, db: Session = Depends(get_db)):
-    db_parallel = db.query(parallelsModel.Parallel).filter(parallelsModel.Parallel.id == parallel_id, parallelsModel.Parallel.course_id == course_id).first()
+    db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == course_id).first()
     if not db_parallel or db_parallel.is_deleted:
         raise HTTPException(status_code=404, detail="Parallel not found")
-
+    if not db_course or db_course.is_deleted:
+        raise HTTPException(status_code=404, detail="Course not found")
+    db_parallel = db.query(parallelsModel.Parallel).filter(parallelsModel.Parallel.id == parallel_id, parallelsModel.Parallel.course_id == course_id).first()
     return db_parallel
 
 # Listar todos los paralelos de un curso
 @router.get("/", response_model=List[parallelsSchemas.Parallel])
 def get_parallels(course_id: int, db: Session = Depends(get_db)):
+    db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == course_id).first()
+    if not db_course or db_course.is_deleted:
+        raise HTTPException(status_code=404, detail="Course not found")
     db_parallels = db.query(parallelsModel.Parallel).filter(parallelsModel.Parallel.course_id == course_id, parallelsModel.Parallel.is_deleted == False).all()
     return db_parallels

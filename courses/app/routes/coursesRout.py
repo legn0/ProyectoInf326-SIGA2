@@ -20,7 +20,7 @@ router = APIRouter(
 
 @router.get("/", response_model=list[coursesSchemas.Course])
 def get_courses(db: Session = Depends(get_db), channel: BlockingChannel = Depends(get_rabbit_channel)):
-    courses = db.query(coursesModel.Course).all()
+    courses = db.query(coursesModel.Course).filter(coursesModel.Course.is_deleted == False).all()
     return courses
 
 @router.get("/{id}", response_model=coursesSchemas.Course) #course por id
