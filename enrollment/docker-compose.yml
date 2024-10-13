@@ -12,6 +12,20 @@ services:
       - "3300:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+  
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
 
   enrollment-service:
     build: .
@@ -22,6 +36,17 @@ services:
       - DATABASE_URL=mysql+pymysql://myuser:mypassword@db/enrollment_db
     depends_on:
       - db
+  
+  rabbitmq-consumer:
+    build:
+      context: ../consumer
+      dockerfile: Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy  # Espera a que RabbitMQ esté saludable
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    command: ["python", "consumer.py"]
 
 volumes:
   mysql_data:

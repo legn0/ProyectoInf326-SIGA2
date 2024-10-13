@@ -2,10 +2,25 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 import models, schemas
 from database import engine, get_db
+import pika
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+def notify_event(event: str, body: str):
+    """Función para enviar un mensaje a RabbitMQ."""
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq'))
+    channel = connection.channel()
+
+    # Declarar una cola (asegurarse de que existe)
+    channel.queue_declare(queue='enrollment_notifications')
+
+    # Publicar un mensaje con la clave de enrutamiento basada en el evento
+    channel.basic_publish(exchange='', routing_key=event, body=body)
+    print(f" [x] Sent {event}: {body}")
+
+    connection.close()
 
 # Consultar una inscripción
 @app.get("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments/{enrollment_id}", response_model=schemas.Enrollment)
@@ -63,6 +78,8 @@ def create_enrollment(course_id: int, parallel_id: int, enrollment_request: sche
     db.add(enrollment_data)
     db.commit()
     db.refresh(enrollment_data)
+
+    notify_event(f"enrollment.{enrollment_data.id}.created", f"Enrollment {enrollment_data.id} has been created.")
     return enrollment_data
 
 # Actualizar una inscripción existente
@@ -85,6 +102,8 @@ def update_enrollment(course_id: int, parallel_id: int, enrollment_id: int, enro
     db_enrollment.is_active = enrollment_request.is_active
     db.commit()
     db.refresh(db_enrollment)
+
+    notify_event(f"enrollment.{db_enrollment.id}.updated", f"Enrollment {db_enrollment.id} has been updated.")
     return db_enrollment
 
 # Eliminar una inscripción
@@ -106,4 +125,5 @@ def delete_enrollment(course_id: int, parallel_id: int, enrollment_id: int, db: 
     db_enrollment.is_active = False
     db.commit()
     db.refresh(db_enrollment)
+    notify_event(f"enrollment.{db_enrollment.id}.deleted", f"Enrollment {db_enrollment.id} has been deleted.")
     return {"message": "Inscripción eliminada exitosamente", "enrollment": db_enrollment}
