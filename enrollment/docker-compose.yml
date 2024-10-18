@@ -12,41 +12,22 @@ services:
       - "3300:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-  
-  rabbitmq:
-    image: "rabbitmq:3-management"
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - rabbitmq
 
   enrollment-service:
     build: .
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     ports:
-      - "8000:8000"
+      - "6000:6000"
     environment:
       - DATABASE_URL=mysql+pymysql://myuser:mypassword@db/enrollment_db
     depends_on:
       - db
-  
-  rabbitmq-consumer:
-    build:
-      context: ../consumer
-      dockerfile: Dockerfile
-    depends_on:
-      rabbitmq:
-        condition: service_healthy  # Espera a que RabbitMQ esté saludable
-    environment:
-      - RABBITMQ_HOST=rabbitmq
-    command: ["python", "consumer.py"]
-
+    networks:
+      - rabbitmq
 volumes:
   mysql_data:
+
+networks:
+  rabbitmq:
+    name: rabbitmq
