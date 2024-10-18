@@ -1,8 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-import models, schemas
+import models, schemas  
 from database import engine, get_db
 import pika
+import httpx
+import logging
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -67,6 +69,32 @@ def create_enrollment(course_id: int, parallel_id: int, enrollment_request: sche
     )
     if existing_enrollment_course:
         raise HTTPException(status_code=400, detail="Estudiante ya inscrito en este curso")
+    
+    try:
+        response = httpx.get(f"http://localhost8000/api/v1/courses/{course_id}/parallels/{parallel_id}")  # Realizar la solicitud HTTP a la API de cursos
+        response.raise_for_status()  # Verificar si la solicitud fue exitosa
+        parallel_data = response.json()  # Obtener los datos en formato JSON
+        
+        limite_cupos = parallel_data['limite_cupo']
+
+    except httpx.HTTPStatusError as exc:
+        logging.error(f"Error al consultar los cupos: {exc}")
+        raise HTTPException(status_code=502, detail="Error al consultar los cupos")
+
+    # Verificar cuántos estudiantes ya están inscritos en este paralelo
+    estudiantes_inscritos = (
+        db.query(models.Enrollment)
+        .filter(
+            models.Enrollment.course_id == course_id,
+            models.Enrollment.parallel_id == parallel_id,
+            models.Enrollment.is_active == True
+        )
+        .count()
+    )
+
+    # Verificar si hay cupos disponibles
+    if estudiantes_inscritos >= limite_cupos:
+        raise HTTPException(status_code=400, detail="No hay cupos disponibles en este paralelo")
 
     # Crear la inscripción
     enrollment_data = models.Enrollment(
@@ -96,6 +124,32 @@ def update_enrollment(course_id: int, parallel_id: int, enrollment_id: int, enro
     )
     if db_enrollment is None:
         raise HTTPException(status_code=404, detail="Inscripción no encontrada")
+    
+    try:
+        response = httpx.get(f"http://localhost8000/api/v1/courses/{course_id}/parallels/{parallel_id}")  # Realizar la solicitud HTTP a la API de cursos
+        response.raise_for_status()  # Verificar si la solicitud fue exitosa
+        parallel_data = response.json()  # Obtener los datos en formato JSON
+        
+        limite_cupos = parallel_data['limite_cupo']
+
+    except httpx.HTTPStatusError as exc:
+        logging.error(f"Error al consultar los cupos: {exc}")
+        raise HTTPException(status_code=502, detail="Error al consultar los cupos")
+
+    # Verificar cuántos estudiantes ya están inscritos en este paralelo
+    estudiantes_inscritos = (
+        db.query(models.Enrollment)
+        .filter(
+            models.Enrollment.course_id == enrollment_request.course_id,
+            models.Enrollment.parallel_id ==enrollment_request. parallel_id,
+            models.Enrollment.is_active == True
+        )
+        .count()
+    )
+
+    # Verificar si hay cupos disponibles
+    if estudiantes_inscritos >= limite_cupos:
+        raise HTTPException(status_code=400, detail="No hay cupos disponibles en este paralelo")
     
     db_enrollment.course_id = enrollment_request.course_id
     db_enrollment.parallel_id = enrollment_request.parallel_id

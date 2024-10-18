@@ -4,3 +4,4 @@ SQLAlchemy
 pymysql
 cryptography
 pika
+httpx
