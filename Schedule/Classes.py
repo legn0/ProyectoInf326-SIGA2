@@ -1,7 +1,14 @@
 from pydantic import BaseModel
+from typing import Optional
 
+# Modelo para crear o actualizar horario en la tabla horarios
 class Horario(BaseModel):
-    nombre_bloque: str | None = None
-    id_bloque: int | None = None
-    tipo_bloque: str | None = None
+    id_bloque: Optional[int] = None
+    nombre_bloque: Optional[str] = None  # Nombre del bloque, e.g., "1-2"
+    tipo: Optional[str] = None            # Tipo de horario, e.g., "Clase", "Ayudantia", "Laboratorio"
+    id_profesor: Optional[int] = None
+    nombre_profesor: Optional[str] = None
+
+    class Config:
+        orm_mode = True
 

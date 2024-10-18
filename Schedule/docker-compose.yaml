@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  fastapi:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - rabbitmq
+    environment:
+      - DB_USER=root
+      - DB_PASSWORD=admin
+      - DB_HOST=localhost
+      - DB_DATABASE=horarios
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_EXCHANGE=horario_events
+      - RABBITMQ_EXCHANGE_TYPE=topic
