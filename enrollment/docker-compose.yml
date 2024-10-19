@@ -2,10 +2,10 @@ services:
   db:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: enrollment_db
-      MYSQL_USER: myuser
-      MYSQL_PASSWORD: mypassword
+      MYSQL_ROOT_PASSWORD: rootpassword  
+      MYSQL_DATABASE: enrollment_db    
+      MYSQL_USER: myuser             
+      MYSQL_PASSWORD: mypassword     
     ports:
       - "3300:3306"
     volumes:

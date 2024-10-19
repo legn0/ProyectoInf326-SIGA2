@@ -47,7 +47,7 @@ class EnrollmentCRUD:
             .filter(
                 Enrollment_model.course_id == course_id,
                 Enrollment_model.parallel_id == parallel_id,
-                Enrollment_model.is_active == "Pendiente"  # Verifica el estado "Pendiente"
+                Enrollment_model.is_active == "Pendiente" 
             )
             .all()
         )
