@@ -11,4 +11,4 @@ COPY . .
 RUN pip install pika
 
 # Run the consumer script
-CMD ["python", "consumer.py"]
+CMD ["python", "./consumer.py"] 

@@ -2,8 +2,15 @@ import pika, sys, os
 import time
 
 def start_consumer():
-    # Cambia 'localhost' por 'rabbitmq', que es el nombre del servicio en Docker Compose
-    connection = pika.BlockingConnection(pika.URLParameters(f"amqp://guest:guest@localhost:5672/%2f?heartbeat=2400"))
+    # Cambia 'localhost' por 'rabbitmq', que es el nombre del servicio en Docker Compose amqp://guest:guest@localhost:5672/%2f?heartbeat=2400
+    while True:
+        try:
+            credentials = pika.PlainCredentials('user', 'password')
+            connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq', credentials=credentials))
+            break  # Sale del bucle si la conexión es exitosa
+        except pika.exceptions.AMQPConnectionError:
+            print(" [!] RabbitMQ is not available, retrying in 5 seconds...")
+            time.sleep(5)
     channel = connection.channel()
 
     # Declara la cola
@@ -18,12 +25,5 @@ def start_consumer():
     print(' [*] Waiting for messages. To exit press CTRL+C')
     channel.start_consuming()
 
-if __name__ == '__main__':
-    try:
-        start_consumer()
-    except KeyboardInterrupt:
-        print('Interrupted')
-        try:
-            sys.exit(0)
-        except SystemExit:
-            os._exit(0)
+start_consumer()
+        

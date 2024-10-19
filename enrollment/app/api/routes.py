@@ -6,12 +6,14 @@ from ..database.database import get_db
 from ..schemas.schemas import Enrollment, EnrollmentCreate, EnrollmentUpdate
 from ..crud.crud import EnrollmentCRUD
 from .external_calls import ExternalCourseAPI
+import os
 
 router = APIRouter()
 
 def notify_event(event: str, body: str):
     """Función para enviar un mensaje a RabbitMQ."""
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host="localhost"))
+    credentials = pika.PlainCredentials('user', 'password')
+    connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq', credentials=credentials))
     channel = connection.channel()
     # Declarar una cola (asegurarse de que existe)
     channel.queue_declare(queue='enrollment_notifications')
