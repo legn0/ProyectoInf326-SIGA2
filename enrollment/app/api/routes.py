@@ -74,14 +74,12 @@ def delete_enrollment(course_id: int, parallel_id: int, enrollment_id: int, db: 
 def enroll_students_round(course_id: int, parallel_id: int, db: Session = Depends(get_db)):
     crud = EnrollmentCRUD(db)
     external_api = ExternalCourseAPI()
-
     # Obtener el límite de cupos desde la API externa
     try:
         parallel_data = external_api.get_parallel_data(course_id, parallel_id)  
         cupos = parallel_data["limite_cupos"]
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
-
     # Consultar los estudiantes con estado "Pendiente"
     pending_enrollments = crud.get_pending_enrollments(course_id, parallel_id)
     
@@ -91,7 +89,6 @@ def enroll_students_round(course_id: int, parallel_id: int, db: Session = Depend
     # Inscribir hasta el límite de cupos disponibles
     number_to_enroll = min(cupos, len(pending_enrollments))
     selected_enrollments = random.sample(pending_enrollments, number_to_enroll)
-
     # Actualizar el estado de las inscripciones seleccionadas a 'Inscrita'
     updated_enrollments = []
     for enrollment in selected_enrollments:

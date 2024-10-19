@@ -4,10 +4,10 @@ services:
   db:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword  # Cambia esto si deseas una contraseña diferente para el usuario root
-      MYSQL_DATABASE: enrollment_db      # La base de datos que se creará automáticamente
-      MYSQL_USER: myuser                 # El nombre de usuario que tú defines
-      MYSQL_PASSWORD: mypassword         # La contraseña del usuario que defines
+      MYSQL_ROOT_PASSWORD: rootpassword  
+      MYSQL_DATABASE: enrollment_db    
+      MYSQL_USER: myuser             
+      MYSQL_PASSWORD: mypassword     
     ports:
       - "3300:3306"
     volumes:
