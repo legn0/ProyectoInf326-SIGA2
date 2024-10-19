@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from ..models.models import Enrollment_model
 from ..schemas.schemas import Enrollment, EnrollmentCreate, EnrollmentUpdate
 
@@ -30,23 +31,23 @@ class EnrollmentCRUD:
         )
     
     def get_enrollment_by_student_and_course(self, student_id: int, course_id: int, parallel_id: int):
-        return self.db.query(Enrollment).filter(
-            Enrollment.student_id == student_id,
-            Enrollment.course_id == course_id,
-            Enrollment.parallel_id == parallel_id,
+        return self.db.query(Enrollment_model).filter(
+            Enrollment_model.student_id == student_id,
+            Enrollment_model.course_id == course_id,
+            Enrollment_model.parallel_id == parallel_id,
             or_(
-            Enrollment.is_active == "Inscrita",
-            Enrollment.is_active == "Pendiente"
+            Enrollment_model.is_active == "Inscrita",
+            Enrollment_model.is_active == "Pendiente"
             )
         ).first()
     
     def get_pending_enrollments(self, course_id: int, parallel_id: int):
         return (
-            self.db.query(Enrollment)
+            self.db.query(Enrollment_model)
             .filter(
-                Enrollment.course_id == course_id,
-                Enrollment.parallel_id == parallel_id,
-                Enrollment.is_active == "Pendiente"  # Verifica el estado "Pendiente"
+                Enrollment_model.course_id == course_id,
+                Enrollment_model.parallel_id == parallel_id,
+                Enrollment_model.is_active == "Pendiente"  # Verifica el estado "Pendiente"
             )
             .all()
         )

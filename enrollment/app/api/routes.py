@@ -11,7 +11,7 @@ router = APIRouter()
 
 def notify_event(event: str, body: str):
     """Función para enviar un mensaje a RabbitMQ."""
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host="localhost"))
     channel = connection.channel()
     # Declarar una cola (asegurarse de que existe)
     channel.queue_declare(queue='enrollment_notifications')

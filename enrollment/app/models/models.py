@@ -10,4 +10,4 @@ class Enrollment_model(Base):
     parallel_id = Column(Integer, index=True)
     course_id = Column(Integer, index=True)
     created_at = Column(DateTime, default=func.now())
-    is_active = Column(String, default="Pendiente")  # Valores: "Inscrita", "Pendiente", "Eliminada"
+    is_active = Column(String(20), default="Pendiente")  # Valores: "Inscrita", "Pendiente", "Eliminada"
