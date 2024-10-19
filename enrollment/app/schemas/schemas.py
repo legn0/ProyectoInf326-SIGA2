@@ -7,7 +7,7 @@ class Enrollment(BaseModel):
     course_id: int 
     parallel_id: int 
     created_at: datetime 
-    is_active: bool  
+    is_active: str
 
     class Config:
         orm_mode = True
@@ -21,7 +21,7 @@ class EnrollmentCreate(BaseModel):
 class EnrollmentUpdate(BaseModel):
     course_id: int 
     parallel_id: int
-    is_active: bool
+    is_active: str
     
     class Config:
         orm_mode = True
