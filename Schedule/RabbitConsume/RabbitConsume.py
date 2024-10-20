@@ -143,9 +143,9 @@ def process_event_cursos(body, routing_key):
                 cursor.execute(query, values)
                 conn.commit()
                 logger.info("Paralelo creado")
-            # Borrar toda la fila o solo el parallel_id??
+            # Borra paralelo y sus datos asociados
             elif accion == "deleted":
-                query = "DELETE FROM horarios.horarios WHERE parallel_id = %s AND course_id = %s"
+                query = "UPDATE horarios.horarios SET parallel_id = NULL, id_profesor = NULL, nombre_profesor = NULL, bloque_id = NULL, tipo = NULL,  updated_at = CURRENT_TIMESTAMP WHERE parallel_id = %s"
                 values = (id, curso_id)
                 cursor.execute(query, values)
                 conn.commit()
@@ -183,7 +183,7 @@ def process_event_users(body, routing_key):
         id = int(routing[1])
         accion = routing[2]
         logger.info(f"Recibido evento: {event} con routing key {routing_key}")
-        query = "SELECT * FROM horarios.horarios WHERE profesor_id = %s"
+        query = "SELECT * FROM horarios.horarios WHERE id_profesor = %s"
         values = (id,)
         cursor.execute(query, values)
         row = cursor.fetchone()
@@ -192,7 +192,7 @@ def process_event_users(body, routing_key):
             return
 
         elif accion == "deleted":
-            query = "UPDATE horarios.horarios SET profesor_id = NULL, nombre_profesor = NULL, updated_at = CURRENT_TIMESTAMP WHERE profesor_id = %s;"
+            query = "UPDATE horarios.horarios SET id_profesor = NULL, nombre_profesor = NULL, updated_at = CURRENT_TIMESTAMP WHERE id_profesor = %s;"
             values = (id,)
             cursor.execute(query, values)
             conn.commit()
