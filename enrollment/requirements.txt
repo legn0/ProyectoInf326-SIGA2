@@ -3,3 +3,5 @@ uvicorn
 SQLAlchemy
 pymysql
 cryptography
+pika
+httpx
