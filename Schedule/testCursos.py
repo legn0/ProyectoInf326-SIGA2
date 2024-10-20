@@ -11,7 +11,7 @@ def publish_test_message():
     
     message =  {
         "curso" : {
-            "id" : 5,
+            "id" : 7,
             "name": "Prueba"
         },
         "numero": 200, #Numero del paralelo distinto al id
@@ -21,7 +21,7 @@ def publish_test_message():
     }
     channel.basic_publish(
         exchange='courses',
-        routing_key='parallel.5.created',
+        routing_key='parallel.84.created',
         body=json.dumps(message),
         properties=pika.BasicProperties(
             delivery_mode=2,  # make message persistent

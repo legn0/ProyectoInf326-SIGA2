@@ -35,8 +35,6 @@ try:
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_config['host']))
     channel = connection.channel()
     channel.exchange_declare(exchange=rabbitmq_config['exchange'], exchange_type=rabbitmq_config['exchange_type'])
-    channel.queue_declare(queue='horario_events', durable=True)
-    channel.queue_bind(exchange=rabbitmq_config['exchange'], queue='horario_events', routing_key='schedule.*.*')
 except pika.exceptions.AMQPConnectionError as e:
     logger.error(f"Failed to connect to RabbitMQ: {e}")
     raise
@@ -71,7 +69,7 @@ def create_schedule(course_id: int, parallel_id: int, horario: Classes.Horario):
         
         # Verificar si ya existe un horario para el course_id y parallel_id que no esté eliminado
         cursor.execute("""
-            SELECT id, bloque_id, tipo FROM horarios
+            SELECT id, bloque_id, tipo, profesor_id, nombre_profesor FROM horarios
             WHERE course_id = %s AND parallel_id = %s AND is_deleted = 0
         """, (course_id, parallel_id))
         existing_schedule = cursor.fetchone()
@@ -96,12 +94,19 @@ def create_schedule(course_id: int, parallel_id: int, horario: Classes.Horario):
         
         update_fields = []
         update_values = []
+        if horario.profesor_id is not None:
+            update_fields.append("profesor_id = %s")
+            update_values.append(horario.profesor_id)
+        if horario.nombre_profesor is not None:
+            update_fields.append("nombre_profesor = %s")
+            update_values.append(horario.nombre_profesor)
         if bloque_id is not None:
             update_fields.append("bloque_id = %s")
             update_values.append(bloque_id)
         if horario.tipo is not None:
             update_fields.append("tipo = %s")
             update_values.append(horario.tipo)
+        
         
         if not update_fields:
             raise HTTPException(status_code=400, detail="No se proporcionaron campos para actualizar")
@@ -121,6 +126,8 @@ def create_schedule(course_id: int, parallel_id: int, horario: Classes.Horario):
             "schedule_id": existing_schedule['id'],
             "course_id": course_id,
             "parallel_id": parallel_id,
+            "profesor_id": horario.profesor_id if horario.profesor_id is not None else existing_schedule['profesor_id'],
+            "nombre_profesor": horario.nombre_profesor if horario.nombre_profesor is not None else existing_schedule['nombre_profesor'],
             "bloque_id": bloque_id if bloque_id is not None else existing_schedule['bloque_id'],
             "tipo": horario.tipo if horario.tipo is not None else existing_schedule['tipo'],
             "is_deleted": False,
@@ -148,14 +155,14 @@ def update_schedule(course_id: int, parallel_id: int, schedule_id: int, horario:
 
         # Verificar que el horario existe y no está eliminado
         cursor.execute("""
-            SELECT bloque_id, tipo FROM horarios
+            SELECT bloque_id, tipo, profesor_id, nombre_profesor FROM horarios
             WHERE id = %s AND course_id = %s AND parallel_id = %s AND is_deleted = 0
         """, (schedule_id, course_id, parallel_id))
         resultado = cursor.fetchone()
         if not resultado:
             raise HTTPException(status_code=404, detail="Horario no encontrado")
 
-        bloque_id_actual, tipo_actual = resultado
+        bloque_id_actual, tipo_actual, profesor_id_actual, nombre_profesor_actual = resultado
 
         # Determinar si se actualizará el bloque
         if horario.nombre_bloque:
@@ -177,14 +184,17 @@ def update_schedule(course_id: int, parallel_id: int, schedule_id: int, horario:
 
         # Determinar si se actualizará el tipo
         tipo = horario.tipo if horario.tipo is not None else tipo_actual
+        profe_id = horario.profesor_id if horario.profesor_id is not None else profesor_id_actual
+        nombre_profe = horario.nombre_profesor if horario.nombre_profesor is not None else nombre_profesor_actual
+
 
         # Actualizar el horario en la base de datos
         update_query = """
             UPDATE horarios
-            SET bloque_id = %s, tipo = %s, updated_at = CURRENT_TIMESTAMP
+            SET bloque_id = %s, tipo = %s, profesor_id = %s, nombre_profesor = %s, updated_at = CURRENT_TIMESTAMP
             WHERE id = %s
         """
-        cursor.execute(update_query, (bloque_id, tipo, schedule_id))
+        cursor.execute(update_query, (bloque_id, tipo, profe_id, nombre_profe, schedule_id))
         conn.commit()
 
         # Emisión del evento de actualización
@@ -194,6 +204,8 @@ def update_schedule(course_id: int, parallel_id: int, schedule_id: int, horario:
             "course_id": course_id,
             "parallel_id": parallel_id,
             "bloque_id": bloque_id,
+            "profesor_id": profe_id,
+            "nombre_profesor": nombre_profe,
             "tipo": tipo,
             "is_deleted": False,
             "updated_at": datetime.now().isoformat()
@@ -269,7 +281,7 @@ def get_info_schedule(course_id: int, parallel_id: int, schedule_id: int):
 
         # Consultar información del horario junto con el nombre del bloque y las horas en formato string
         cursor.execute("""
-            SELECT h.id, h.course_id, h.parallel_id, h.bloque_id, b.nombre AS bloque_nombre,
+            SELECT h.id, h.course_id, h.parallel_id, h.bloque_id, b.nombre AS bloque_nombre, h.profesor_id, h.nombre_profesor,
                    h.tipo, h.is_deleted, h.created_at, h.updated_at,
                    b.hora_inicio,  -- Aquí se obtiene directamente como string
                    b.hora_fin     -- Aquí también como string
@@ -309,7 +321,7 @@ def get_parallel_schedule(course_id: int, parallel_id: int):
 
         # Consultar todos los horarios del paralelo que no están eliminados
         cursor.execute("""
-            SELECT h.id, h.course_id, h.parallel_id, h.bloque_id, b.nombre AS bloque_nombre,
+            SELECT h.id, h.course_id, h.parallel_id, h.bloque_id, b.nombre AS bloque_nombre, h.profesor_id, h.nombre_profesor,
                    h.tipo, h.is_deleted, h.created_at, h.updated_at
             FROM horarios h
             LEFT JOIN bloques_horario b ON h.bloque_id = b.id

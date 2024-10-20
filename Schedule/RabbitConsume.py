@@ -178,6 +178,7 @@ if __name__ == "__main__":
     thread_cursos = threading.Thread(target=consume_event, args=("courses", process_event_cursos))
     thread_users = threading.Thread(target=consume_event, args=("users", process_event_users))
 
+
     thread_cursos.start()
     thread_users.start()
 
