@@ -1,5 +1,4 @@
-<<<<<<< Updated upstream
-=======
+
 services:
   mysql-container:
     image: mysql:8.0
@@ -58,4 +57,4 @@ services:
 
 volumes:
   db_data:
->>>>>>> Stashed changes
+
