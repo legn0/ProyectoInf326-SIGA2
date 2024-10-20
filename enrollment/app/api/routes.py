@@ -12,13 +12,18 @@ router = APIRouter()
 
 def notify_event(event: str, body: str):
     """Función para enviar un mensaje a RabbitMQ."""
-    credentials = pika.PlainCredentials('user', 'password')
+    credentials = pika.PlainCredentials('guest', 'guest')
     connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq', credentials=credentials))
     channel = connection.channel()
+    
+    channel.exchange_declare(exchange="enrollment",
+                            exchange_type="topic"
+                             )
+
     # Declarar una cola (asegurarse de que existe)
     channel.queue_declare(queue='enrollment_notifications')
     # Publicar un mensaje con la clave de enrutamiento basada en el evento
-    channel.basic_publish(exchange='', routing_key=event, body=body)
+    channel.basic_publish(exchange='enrollment', routing_key=event, body=body)
     print(f" [x] Sent {event}: {body}")
     connection.close()
 
@@ -120,7 +125,7 @@ def enroll_students_round(course_id: int, parallel_id: int, db: Session = Depend
     # Obtener el límite de cupos desde la API externa
     try:
         parallel_data = external_api.get_parallel_data(course_id, parallel_id)  
-        cupos = parallel_data["limite_cupos"]
+        cupos = parallel_data["limite_cupo"]
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
     # Consultar los estudiantes con estado "Pendiente"
@@ -136,7 +141,7 @@ def enroll_students_round(course_id: int, parallel_id: int, db: Session = Depend
     updated_enrollments = []
     for enrollment in selected_enrollments:
         enrollment.is_active = "Inscrita"  # Cambiar el estado a "Inscrita"
-        updated_enrollment = crud.update_enrollment_status(enrollment.id, enrollment)
+        updated_enrollment = crud.update_enrollment(enrollment.id, enrollment)
         updated_enrollments.append(updated_enrollment)
 
     return updated_enrollments
