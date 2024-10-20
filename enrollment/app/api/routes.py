@@ -23,8 +23,15 @@ def notify_event(event: str, body: str):
     connection.close()
 
 # Consultar una inscripción
-@router.get("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments/{enrollment_id}", response_model=Enrollment)
+@router.get("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments/{enrollment_id}", response_model=Enrollment, summary="Get Enrollment Details", description="Retrieve the details of a specific enrollment by ID, course, and parallel.")
 def read_enrollment(course_id: int, parallel_id: int, enrollment_id: int, db: Session = Depends(get_db)):
+    """
+    Get the details of a specific enrollment.
+    
+    - **course_id**: ID of the course
+    - **parallel_id**: ID of the parallel
+    - **enrollment_id**: ID of the enrollment to retrieve
+    """
     crud = EnrollmentCRUD(db)
     enrollment = crud.get_enrollment(enrollment_id, course_id, parallel_id)
     if enrollment is None:
@@ -32,14 +39,27 @@ def read_enrollment(course_id: int, parallel_id: int, enrollment_id: int, db: Se
     return enrollment
 
 # Listar todas las inscripciones de un paralelo
-@router.get("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments", response_model=list[Enrollment])
+@router.get("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments", response_model=list[Enrollment], summary="List All Enrollments", description="Retrieve all enrollments for a specific course and parallel.")
 def list_enrollments(course_id: int, parallel_id: int, db: Session = Depends(get_db)):
+    """
+    Get a list of all enrollments for a specific parallel.
+
+    - **course_id**: ID of the course
+    - **parallel_id**: ID of the parallel
+    """
     crud = EnrollmentCRUD(db)
     return crud.list_enrollments(course_id, parallel_id)
 
 # Crear una nueva inscripción
-@router.post("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments", response_model=Enrollment)
+@router.post("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments", response_model=Enrollment, summary="Create a New Enrollment", description="Create a new enrollment for a course and parallel. The student must not be already enrolled.")
 def create_enrollment(course_id: int, parallel_id: int, enrollment_request: EnrollmentCreate, db: Session = Depends(get_db)):
+    """
+    Create a new enrollment.
+
+    - **course_id**: ID of the course
+    - **parallel_id**: ID of the parallel
+    - **enrollment_request**: The enrollment request data
+    """
     crud = EnrollmentCRUD(db)
      # Verificar si el estudiante ya está inscrito en el curso y paralelo
     existing_enrollment = crud.get_enrollment_by_student_and_course(enrollment_request.student_id, course_id, parallel_id)
@@ -52,8 +72,16 @@ def create_enrollment(course_id: int, parallel_id: int, enrollment_request: Enro
     return enrollment_data
 
 # Actualizar una inscripción existente
-@router.put("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments/{enrollment_id}", response_model=Enrollment)
+@router.put("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments/{enrollment_id}", response_model=Enrollment, summary="Update Enrollment", description="Update an existing enrollment by ID, course, and parallel.")
 def update_enrollment(course_id: int, parallel_id: int, enrollment_id: int, enrollment_request: EnrollmentUpdate, db: Session = Depends(get_db)):
+    """
+    Update the details of an existing enrollment.
+
+    - **course_id**: ID of the course
+    - **parallel_id**: ID of the parallel
+    - **enrollment_id**: ID of the enrollment to update
+    - **enrollment_request**: The updated enrollment data
+    """
     crud = EnrollmentCRUD(db)
     enrollment_data = crud.update_enrollment(enrollment_id, enrollment_request)
     if enrollment_data is None:
@@ -62,8 +90,15 @@ def update_enrollment(course_id: int, parallel_id: int, enrollment_id: int, enro
     return enrollment_data
 
 # Eliminar una inscripción
-@router.delete("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments/{enrollment_id}")
+@router.delete("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments/{enrollment_id}", summary="Delete Enrollment", description="Delete an enrollment by ID, course, and parallel.")
 def delete_enrollment(course_id: int, parallel_id: int, enrollment_id: int, db: Session = Depends(get_db)):
+    """
+    Delete an enrollment by ID, course, and parallel.
+
+    - **course_id**: ID of the course
+    - **parallel_id**: ID of the parallel
+    - **enrollment_id**: ID of the enrollment to delete
+    """
     crud = EnrollmentCRUD(db)
     deleted = crud.delete_enrollment(enrollment_id)
     if deleted is None:
@@ -72,8 +107,14 @@ def delete_enrollment(course_id: int, parallel_id: int, enrollment_id: int, db: 
     return {"message": "Inscripción eliminada exitosamente", "enrollment": deleted}
 
 #Realizar una ronda de inscripción
-@router.post("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments/round", response_model=list[Enrollment])
+@router.post("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments/round", response_model=list[Enrollment], summary="Enrollment Round", description="Enroll students up to the available spots for a course parallel, randomly selecting pending enrollments.")
 def enroll_students_round(course_id: int, parallel_id: int, db: Session = Depends(get_db)):
+    """
+    Conduct an enrollment round to randomly select students for available spots in the parallel.
+
+    - **course_id**: ID of the course
+    - **parallel_id**: ID of the parallel
+    """
     crud = EnrollmentCRUD(db)
     external_api = ExternalCourseAPI()
     # Obtener el límite de cupos desde la API externa
