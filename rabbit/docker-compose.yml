@@ -1,0 +1,20 @@
+networks:
+  rabbitmq:
+    name: rabbitmq
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 30s
+      timeout: 30s
+      retries: 10
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+    networks:
+      - rabbitmq
+
