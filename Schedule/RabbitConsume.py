@@ -23,7 +23,22 @@ db_config = {
     'database': os.getenv('DB_DATABASE', 'horarios')
 }
 
+
 def consume_event(cola,callback):
+
+    """
+    Funcion consume_event
+
+    Consume eventos de una cola de RabbitMQ y llama a una funcion de callback para procesar el evento.
+
+    Args:
+        cola (str): Nombre de la cola a consumir
+        callback (function): Funcion a llamar para procesar el evento
+
+    Returns:
+        None
+
+    """
     try:
         connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
         channel = connection.channel()
@@ -46,7 +61,23 @@ def consume_event(cola,callback):
     except Exception as e:
         print(f"Error al consumir evento {e}")
 
+
+
+
 def process_event_cursos(body, routing_key):
+    """
+    Funcion process_event_cursos
+
+    Procesa eventos de cursos y paralelos de la cola Courses de RabbitMQ.
+
+    Args:
+        body (str): Cuerpo del mensaje
+        routing_key (str): Routing key del mensaje
+
+    Returns:
+        None
+
+    """
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
@@ -131,8 +162,22 @@ def process_event_cursos(body, routing_key):
             conn.close()
 
 
-##Procesa los eventos de profesores, como aqui no estan vinculados con cursos o paralelos, solo se podrian eliminar de la tabla.
+
 def process_event_users(body, routing_key):
+
+    """
+    Funcion process_event_users
+
+    Procesa eventos de profesores de la cola Users de RabbitMQ.
+
+    Args: 
+        body (str): Cuerpo del mensaje
+        routing_key (str): Routing key del mensaje
+
+    Returns:
+        None
+
+    """
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)

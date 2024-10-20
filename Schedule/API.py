@@ -9,8 +9,31 @@ import json
 import os
 import logging
 
+descripcion = """
+API para la gestión de horarios de clases en la universidad USM, parte del modulo cursos.
 
-app = FastAPI()
+## Funciones:
+
+- Crear un nuevo horario para un paralelo específico
+- Actualizar la información de un horario existente
+- Eliminar (soft delete) un horario existente
+- Obtener información detallada de un horario específico
+- Listar todos los horarios de un paralelo específico
+
+"""
+
+app = FastAPI(
+    title="API Schedule",
+    sumarry="API para la gestión de horarios de clases",
+    description=descripcion
+)
+
+tags_metadata = [
+    {
+        "name": "Metodos HTTP",
+        "description": "Metodos HTTP para la gestión de horarios de clases."
+    }
+]
 
 db_config = {
     'user': os.getenv('DB_USER', 'root'),
@@ -39,9 +62,23 @@ except pika.exceptions.AMQPConnectionError as e:
     logger.error(f"Failed to connect to RabbitMQ: {e}")
     raise
 
-##Función para emitir eventos con RabbitMQ
+
+
 
 def emit_event(routing_key: str, body: dict):
+    """
+    Funcion emit_event
+
+    Emite un evento a un exchange de Rabbit
+
+    Args:
+        routing_key (str): La clave de enrutamiento del evento
+        body (dict): El cuerpo del evento
+
+    Returns:
+        None
+
+    """
     try:
         channel.basic_publish(
             exchange=rabbitmq_config['exchange'],
@@ -58,10 +95,22 @@ if __name__ == "__main__":
     finally:
         connection.close()
 
-#Crear un nuevo horario para un paralelo específico
 
-@app.post("/api/v1/courses/{course_id}/parallels/{parallel_id}/schedules", status_code=201)
+
+@app.post("/api/v1/courses/{course_id}/parallels/{parallel_id}/schedules", status_code=201, tags=["Metodos HTTP"])
 def create_schedule(course_id: int, parallel_id: int, horario: Classes.Horario):
+    """
+    Funcion create_schedule
+
+    Crea un nuevo horario para un curso existente en la base de datos.
+
+    Args:
+        course_id (int): El ID del curso al que pertenece el horario.
+        parallel_id (int): El ID del paralelo al que pertenece el horario.
+        horario (Classes.Horario): Los datos del horario a crear.
+    Returns:
+        dict: Un diccionario con un mensaje de éxito y el ID del horario creado.
+    """
 
     try:
         conn = mysql.connector.connect(**db_config)
@@ -145,9 +194,24 @@ def create_schedule(course_id: int, parallel_id: int, horario: Classes.Horario):
         if conn:
             conn.close()
 
-#Actualizar la información de un horario existente
-@app.put("/api/v1/courses/{course_id}/parallels/{parallel_id}/schedules/{schedule_id}")
+
+
+@app.put("/api/v1/courses/{course_id}/parallels/{parallel_id}/schedules/{schedule_id}", tags=["Metodos HTTP"])
 def update_schedule(course_id: int, parallel_id: int, schedule_id: int, horario: Classes.Horario):
+
+    """
+    Funcion update_schedule
+
+    Actualiza la información de un horario existente en la base de datos.
+
+    Args:
+        course_id (int): El ID del curso al que pertenece el horario.
+        parallel_id (int): El ID del paralelo al que pertenece el horario.
+        schedule_id (int): El ID del horario a actualizar.
+        horario (Classes.Horario): Los datos del horario a actualizar.
+    Returns:
+        dict: Un diccionario con un mensaje de éxito.
+    """
 
     try:
         conn = mysql.connector.connect(**db_config)
@@ -222,10 +286,26 @@ def update_schedule(course_id: int, parallel_id: int, schedule_id: int, horario:
         if conn:
             conn.close()
 
-#Eliminar (soft delete) un horario existente
-@app.delete("/api/v1/courses/{course_id}/parallels/{parallel_id}/schedules/{schedule_id}")
+
+
+
+@app.delete("/api/v1/courses/{course_id}/parallels/{parallel_id}/schedules/{schedule_id}", tags=["Metodos HTTP"])
 def delete_schedule(course_id: int, parallel_id: int, schedule_id: int):
 
+    """
+    Funcion delete_schedule
+
+    Elimina (soft delete) un horario existente en la base de datos.
+
+    Args:
+        course_id (int): El ID del curso al que pertenece el horario.
+        parallel_id (int): El ID del paralelo al que pertenece el horario.
+        schedule_id (int): El ID del horario a eliminar.
+
+    Returns:
+        dict: Un diccionario con un mensaje de éxito.
+
+    """
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
@@ -271,10 +351,24 @@ def delete_schedule(course_id: int, parallel_id: int, schedule_id: int):
         if conn:
             conn.close()
 
-#Obtener información detallada de un horario específico
-@app.get("/api/v1/courses/{course_id}/parallels/{parallel_id}/schedules/{schedule_id}")
+
+@app.get("/api/v1/courses/{course_id}/parallels/{parallel_id}/schedules/{schedule_id}", tags=["Metodos HTTP"])
 def get_info_schedule(course_id: int, parallel_id: int, schedule_id: int):
 
+    """
+    Funcion get_info_schedule
+
+    Obtiene información detallada de un horario específico en la base de datos.
+
+    Args:
+        course_id (int): El ID del curso al que pertenece el horario.
+        parallel_id (int): El ID del paralelo al que pertenece el horario.
+        schedule_id (int): El ID del horario a obtener.
+
+    Returns:
+        dict: Un diccionario con la información detallada del horario.
+
+    """
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
@@ -310,10 +404,25 @@ def get_info_schedule(course_id: int, parallel_id: int, schedule_id: int):
         if conn:
             conn.close()
 
-            
-#Listar todos los horarios de un paralelo específico
-@app.get("/api/v1/courses/{course_id}/parallels/{parallel_id}/schedules")
+
+
+@app.get("/api/v1/courses/{course_id}/parallels/{parallel_id}/schedules", tags=["Metodos HTTP"])
 def get_parallel_schedule(course_id: int, parallel_id: int):
+
+    """
+    Funcion get_parallel_schedule
+
+    Lista todos los horarios de un paralelo específico en la base de datos.
+
+    Args:
+        course_id (int): El ID del curso al que pertenece el paralelo.
+        parallel_id (int): El ID del paralelo a listar.
+
+    Returns:
+        list: Una lista de diccionarios con la información de los horarios del paralelo.
+
+    """            
+
 
     try:
         conn = mysql.connector.connect(**db_config)
