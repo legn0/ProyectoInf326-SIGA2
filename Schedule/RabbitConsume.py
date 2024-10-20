@@ -23,11 +23,14 @@ db_config = {
     'database': os.getenv('DB_DATABASE', 'horarios')
 }
 
-def consume_event(queue_name: str, callback):
+def consume_event(cola,callback):
     try:
         connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
         channel = connection.channel()
-        channel.queue_declare(queue=queue_name, durable=True)
+        channel.exchange_declare(exchange=cola, exchange_type=rabbitmq_config['exchange_type'])
+        result = channel.queue_declare(queue=cola, durable=True)
+        queue_name = result.method.queue
+        channel.queue_bind(exchange=cola, queue=queue_name, routing_key="*.*.*")
         def on_message(channel, method, properties, body):
             try:
                 callback(body, routing_key=method.routing_key)
@@ -38,7 +41,7 @@ def consume_event(queue_name: str, callback):
 
         channel.basic_consume(queue=queue_name, on_message_callback=on_message)
 
-        print(f"[*] Esperando mensajes en {queue_name}.")
+        print(f"[*] Esperando mensajes en {cola}.")
         channel.start_consuming()
     except Exception as e:
         print(f"Error al consumir evento {e}")
@@ -53,7 +56,7 @@ def process_event_cursos(body, routing_key):
         id = int(routing[1])
         accion = routing[2]
         print(f"Recibido evento: {event} con routing key {routing_key}")
-        print(f"Cursos: tipo: {tipo}, id: {id}, accion: {accion}")
+
 
         if tipo == "course":
             # Verificar si el curso existe
@@ -138,7 +141,7 @@ def process_event_users(body, routing_key):
         tipo = routing[0]
         id = int(routing[1])
         accion = routing[2]
-        print(f"Users: tipo: {tipo}, id: {id}, accion: {accion}")
+        print(f"Recibido evento: {event} con routing key {routing_key}")
         query = "SELECT * FROM horarios.horarios WHERE profesor_id = %s"
         values = (id,)
         cursor.execute(query, values)
@@ -172,8 +175,8 @@ def signal_handler(sig, frame):
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
 
-    thread_cursos = threading.Thread(target=consume_event, args=("cursos_events", process_event_cursos))
-    thread_users = threading.Thread(target=consume_event, args=("user_events", process_event_users))
+    thread_cursos = threading.Thread(target=consume_event, args=("courses", process_event_cursos))
+    thread_users = threading.Thread(target=consume_event, args=("users", process_event_users))
 
     thread_cursos.start()
     thread_users.start()

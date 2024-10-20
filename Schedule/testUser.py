@@ -5,8 +5,6 @@ def publish_test_message():
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
     channel.exchange_declare(exchange='users', exchange_type='topic')
-    channel.queue_declare(queue='user_events', durable=True)
-    channel.queue_bind(exchange='users', queue='user_events', routing_key='*.*.*')
     
     message = {'test': 'Muere profesor'}
     channel.basic_publish(

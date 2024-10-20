@@ -7,8 +7,7 @@ def publish_test_message():
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
     channel.exchange_declare(exchange='courses', exchange_type='topic')
-    channel.queue_declare(queue='cursos_events', durable=True)
-    channel.queue_bind(exchange='courses', queue='cursos_events', routing_key='*.*.*')
+
     
     message =  {
         "curso" : {
