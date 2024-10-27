@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enrollment-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enrollment-app
+  template:
+    metadata:
+      labels:
+        app: enrollment-app
+    spec:
+      containers:
+      - name: enrollment-container
+        image: ttl.sh/enrollment-img:8h
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 8002
+        envFrom:
+
+        - secretRef:
+            name: enrollment-secrets

@@ -2,9 +2,13 @@ import time
 import pika as pk
 from pika.adapters.blocking_connection import BlockingChannel
 import pika.exceptions as pkex
+import os
 
 rabbit_conn = None
 rabbit_channel = None
+RABBIT_USER = os.getenv("RABBIT_USER")
+RABBIT_PASSWORD = os.getenv("RABBIT_PASSWORD")
+RABBIT_NAME = os.getenv("RABBIT_NAME")
 
 def get_rabbit_channel() -> BlockingChannel:
     '''
@@ -17,13 +21,16 @@ def get_rabbit_channel() -> BlockingChannel:
     '''
     
     global rabbit_conn, rabbit_channel
-    if  rabbit_conn.is_closed:
+    if rabbit_conn != None:
+        if  rabbit_conn.is_closed:
+            create_rabbit_connection()
+        elif rabbit_channel.is_closed:
+            rabbit_channel= rabbit_conn.channel()
+            rabbit_channel.exchange_declare(exchange="courses", #Creacion de topico
+                        exchange_type="topic"
+                        ) 
+    else:
         create_rabbit_connection()
-    elif rabbit_channel.is_closed:
-        rabbit_channel= rabbit_conn.channel()
-        rabbit_channel.exchange_declare(exchange="courses", #Creacion de topico
-                     exchange_type="topic"
-                     )
     return rabbit_channel
 
 def create_rabbit_connection():
@@ -50,7 +57,7 @@ def create_rabbit_connection():
         
         global rabbit_channel, rabbit_conn
         try: 
-            rabbit_conn = pk.BlockingConnection(pk.URLParameters(f"amqp://guest:guest@rabbitmq:5672/%2f?heartbeat=240")) #Coneccion con rabbit
+            rabbit_conn = pk.BlockingConnection(pk.URLParameters(f"amqp://{RABBIT_USER}:{RABBIT_PASSWORD}@{RABBIT_NAME}:5672/%2f?heartbeat=240")) #Coneccion con rabbit
             rabbit_channel = rabbit_conn.channel()
             rabbit_channel.exchange_declare(exchange="courses", #Creacion de topico
                             exchange_type="topic"

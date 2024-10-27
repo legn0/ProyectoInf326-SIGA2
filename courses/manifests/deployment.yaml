@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: courses-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: courses-app
+  template:
+    metadata:
+      labels:
+        app: courses-app
+    spec:
+      containers:
+      - name: courses-container
+        image: ttl.sh/courses-img:8h
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 8000
+        envFrom:
+
+        - secretRef:
+            name: courses-secrets

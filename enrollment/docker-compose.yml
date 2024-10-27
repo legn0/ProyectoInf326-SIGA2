@@ -1,0 +1,33 @@
+networks:
+  rabbitmq:
+    name: rabbitmq
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  
+      MYSQL_DATABASE: enrollment_db    
+      MYSQL_USER: myuser             
+      MYSQL_PASSWORD: mypassword     
+    ports:
+      - "3300:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rabbitmq
+
+  enrollment-service:
+    container_name: enrollment-app
+    image: enrollment-img
+    ports:
+      - "8002:8002"
+    environment:
+      - DATABASE_URL=mysql+pymysql://myuser:mypassword@db/enrollment_db
+    depends_on:
+      - db
+    networks:
+      - rabbitmq
+
+volumes:
+  mysql_data:

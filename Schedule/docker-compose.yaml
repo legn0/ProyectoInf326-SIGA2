@@ -1,0 +1,73 @@
+networks:
+  rabbitmq:
+    name: rabbitmq
+
+services:
+  mysql-container:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: 'horarios'
+      MYSQL_USER: 'yo'
+      MYSQL_PASSWORD: 'admin'
+      MYSQL_ROOT_PASSWORD: 'admin'
+    ports:
+      - '3307:3306'
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - rabbitmq
+
+  fastapi:
+    container_name: schedule-app
+    image: schedule-img  
+    command: uvicorn API:app --reload --host 0.0.0.0 --port 8001 
+    ports:
+      - '8001:8001'
+    volumes:
+      - .:/app
+    environment:
+      - DB_USER=yo
+      - DB_PASSWORD=admin
+      - DB_HOST=mysql-container
+      - DB_DATABASE=horarios
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_EXCHANGE=horario_events
+      - RABBITMQ_EXCHANGE_TYPE=topic
+    depends_on:
+      mysql-container: 
+        condition: service_healthy  # Asegúrate de que el contenedor de MySQL esté saludable
+    networks:
+      - rabbitmq
+
+  consumer:
+    build: 
+      context: .
+      dockerfile: ./RabbitConsume/Dockerfile
+    command: python RabbitConsume.py
+    volumes:
+      - .:/app
+    environment:
+      - DB_USER=yo
+      - DB_PASSWORD=admin
+      - DB_HOST=mysql-container
+      - DB_DATABASE=horarios
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_EXCHANGE=horario_events
+      - RABBITMQ_EXCHANGE_TYPE=topic
+    depends_on:
+      mysql-container: 
+        condition: service_healthy  # Asegúrate de que el contenedor de MySQL esté saludable
+      fastapi:
+        condition: service_started  # Asegúrate de que el contenedor de FastAPI esté saludable
+
+    networks:
+      - rabbitmq
+
+volumes:
+  db_data:
