@@ -1,12 +1,12 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: courses-hpa
+  name: schedule-hpa
 spec:
   scaleTargetRef:
     apiVersion: app/v1
     kind: Deployment
-    name: courses-app
+    name: schedule-app
   minReplicas: 1
   maxReplicas: 5
   metrics:

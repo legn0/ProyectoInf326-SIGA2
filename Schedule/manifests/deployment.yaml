@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schedule-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: schedule-app
+  template:
+    metadata:
+      labels:
+        app: schedule-app
+    spec:
+      containers:
+      - name: schedule-container
+        image: ttl.sh/schedule-img:8h
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 8001
+        envFrom:
+
+        - secretRef:
+            name: schedule-secrets
+      
+      - name: schedule-rabbit-consume-container
+        image: ttl.sh/schedule-rabbit-consume-img:8h
+        imagePullPolicy: "Always"
+        envFrom:
+
+          - secretRef:
+              name: schedule-consume-secrets

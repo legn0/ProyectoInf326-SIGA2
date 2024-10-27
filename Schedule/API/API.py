@@ -36,14 +36,16 @@ tags_metadata = [
 ]
 
 db_config = {
-    'user': os.getenv('DB_USER', 'root'),
-    'password': os.getenv('DB_PASSWORD', 'admin'),
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'database': os.getenv('DB_DATABASE', 'horarios')
+    'user': os.getenv('MYSQL_USER', 'root'),
+    'password': os.getenv('MYSQL_PASSWORD', 'admin'),
+    'host': os.getenv('SQLALCHEMY_DATABASE_URL', 'localhost'),
+    'database': os.getenv('MYSQL_DATABASE', 'horarios')
 }
 
 rabbitmq_config = {
-    'host': os.getenv('RABBITMQ_HOST', 'localhost'),
+    'host': os.getenv('RABBIT_NAME', 'localhost'),
+    'user': os.getenv('RABBIT_USER'),
+    'password': os.getenv("RABBIT_PASSWORD"),
     'exchange': os.getenv('RABBITMQ_EXCHANGE', 'horario_events'),
     'exchange_type': os.getenv('RABBITMQ_EXCHANGE_TYPE', 'topic')
 }
@@ -55,7 +57,7 @@ logger = logging.getLogger(__name__)
 ##Conexión a RabbitMQ
 
 try:
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_config['host']))
+    connection = pika.BlockingConnection(pika.URLParameters(f"amqp://{rabbitmq_config['user']}:{rabbitmq_config['password']}@{rabbitmq_config['host']}:5672/%2f?heartbeat=240"))
     channel = connection.channel()
     channel.exchange_declare(exchange=rabbitmq_config['exchange'], exchange_type=rabbitmq_config['exchange_type'])
 except pika.exceptions.AMQPConnectionError as e:

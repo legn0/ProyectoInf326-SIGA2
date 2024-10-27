@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: courses-app
+  name: enrollment-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: courses-app
+      app: enrollment-app
   template:
     metadata:
       labels:
-        app: courses-app
+        app: enrollment-app
     spec:
       containers:
-      - name: courses-container
-        image: ttl.sh/courses-img:8h
+      - name: enrollment-container
+        image: ttl.sh/enrollment-img:8h
         imagePullPolicy: "Always"
         ports:
-        - containerPort: 8000
+        - containerPort: 8002
         envFrom:
 
         - secretRef:
-            name: courses-secrets
+            name: enrollment-secrets
