@@ -10,6 +10,12 @@ services:
       MYSQL_DATABASE: enrollment_db    
       MYSQL_USER: myuser             
       MYSQL_PASSWORD: mypassword     
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 30s
+      retries: 10
+      start_period: 30s
     ports:
       - "3300:3306"
     volumes:
@@ -28,6 +34,16 @@ services:
       - db
     networks:
       - rabbitmq
+  
+  consumer:
+    build: 
+      context: .
+      dockerfile: ./app/rabbit-consume/Dockerfile
+    depends_on:
+      db: 
+        condition: service_healthy  # Asegúrate de que el contenedor de MySQL esté saludable
+      enrollment-service:
+        condition: service_started  # Asegúrate de que el contenedor de FastAPI esté saludable
 
 volumes:
   mysql_data:
