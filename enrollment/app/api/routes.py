@@ -130,12 +130,15 @@ def enroll_students_round(course_id: int, parallel_id: int, db: Session = Depend
         raise HTTPException(status_code=500, detail=str(e))
     # Consultar los estudiantes con estado "Pendiente"
     pending_enrollments = crud.get_pending_enrollments(course_id, parallel_id)
+    active_enrollments = crud.list_enrollments(course_id, parallel_id)
+
+    print(len(active_enrollments))
     
     if not pending_enrollments:
         raise HTTPException(status_code=404, detail="No hay inscripciones pendientes para este curso y paralelo")
 
     # Inscribir hasta el límite de cupos disponibles
-    number_to_enroll = min(cupos, len(pending_enrollments))
+    number_to_enroll = min(cupos-len(active_enrollments), len(pending_enrollments))
     selected_enrollments = random.sample(pending_enrollments, number_to_enroll)
     # Actualizar el estado de las inscripciones seleccionadas a 'Inscrita'
     updated_enrollments = []
