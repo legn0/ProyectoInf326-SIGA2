@@ -4,3 +4,5 @@ sqlalchemy
 mysqlclient
 pika
 python-dotenv
+pymysql
+cryptography

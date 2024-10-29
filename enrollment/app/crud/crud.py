@@ -90,3 +90,27 @@ class EnrollmentCRUD:
             self.db.commit()
             return enrollment
         return None
+    
+    def delete_course(self, course_id):
+        enrollments = (
+            self.db.query(Enrollment_model)
+            .filter(Enrollment_model.course_id == course_id)
+        ).all()
+        print(enrollments)
+        if enrollments:
+            for enrollment in enrollments:
+                enrollment.is_active = "Eliminada"
+                self.db.commit()
+        return None
+    
+    def parallel_course(self, parallel_id):
+        enrollments = (
+            self.db.query(Enrollment_model)
+            .filter(Enrollment_model.parallel_id == parallel_id)
+        ).all()
+        
+        if enrollments:
+            for enrollment in enrollments:
+                enrollment.is_active = "Eliminada"
+                self.db.commit()
+        return None

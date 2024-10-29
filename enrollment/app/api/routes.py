@@ -108,7 +108,7 @@ def delete_enrollment(course_id: int, parallel_id: int, enrollment_id: int, db: 
     deleted = crud.delete_enrollment(enrollment_id)
     if deleted is None:
         raise HTTPException(status_code=404, detail="Inscripción no encontrada")
-    notify_event(f"enrollment.{enrollment_id.id}.deleted", f"Enrollment {enrollment_id.id} has been deleted.")
+    notify_event(f"enrollment.{enrollment_id}.deleted", f"Enrollment {enrollment_id} has been deleted.")
     return {"message": "Inscripción eliminada exitosamente", "enrollment": deleted}
 
 #Realizar una ronda de inscripción
