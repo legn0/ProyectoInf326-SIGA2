@@ -8,6 +8,7 @@ import pika
 import json
 import os
 import logging
+from time import sleep
 
 descripcion = """
 API para la gestión de horarios de clases en la universidad USM, parte del modulo cursos.
@@ -36,64 +37,73 @@ tags_metadata = [
 ]
 
 db_config = {
-    'user': os.getenv('DB_USER', 'root'),
-    'password': os.getenv('DB_PASSWORD', 'admin'),
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'database': os.getenv('DB_DATABASE', 'horarios')
+    'user': os.getenv('MYSQL_USER', 'root'),
+    'password': os.getenv('MYSQL_PASSWORD', 'admin'),
+    'host': os.getenv('SQLALCHEMY_DATABASE_URL', 'localhost'),
+    'database': os.getenv('MYSQL_DATABASE', 'horarios')
 }
 
-rabbitmq_config = {
-    'host': os.getenv('RABBITMQ_HOST', 'localhost'),
-    'exchange': os.getenv('RABBITMQ_EXCHANGE', 'horario_events'),
-    'exchange_type': os.getenv('RABBITMQ_EXCHANGE_TYPE', 'topic')
-}
+# rabbitmq_config = {
+#     'exchange': os.getenv('RABBITMQ_EXCHANGE', 'horario_events'),
+#     'exchange_type': os.getenv('RABBITMQ_EXCHANGE_TYPE', 'topic')
+# }
+
+# RABBIT_USER = os.getenv("RABBIT_USER")
+# RABBIT_PASSWORD = os.getenv("RABBIT_PASSWORD")
+# RABBIT_NAME = os.getenv("RABBIT_NAME")
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-##Conexión a RabbitMQ
+# ##Conexión a RabbitMQ
+# tries = 0
+# opened = False
+# while tries < 5 and not opened:
+#     try:
+#         connection = pika.BlockingConnection(pika.URLParameters(f"amqp://{RABBIT_USER}:{RABBIT_PASSWORD}@{RABBIT_NAME}:5672/%2f"))
+#         channel = connection.channel()
+#         channel.exchange_declare(exchange=rabbitmq_config['exchange'], exchange_type=rabbitmq_config['exchange_type'])
+#     except pika.exceptions.AMQPConnectionError as e:
+#         logger.error(f"Failed to connect to RabbitMQ: {e}")
+#         tries += 1
+#         if tries > 5:
+#             raise
+#         sleep(3)
+#         continue
+#     opened = True
+    
 
-try:
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_config['host']))
-    channel = connection.channel()
-    channel.exchange_declare(exchange=rabbitmq_config['exchange'], exchange_type=rabbitmq_config['exchange_type'])
-except pika.exceptions.AMQPConnectionError as e:
-    logger.error(f"Failed to connect to RabbitMQ: {e}")
-    raise
 
 
+# def emit_event(routing_key: str, body: dict):
+#     """
+#     ## Funcion emit_event
 
+#     ## Emite un evento a un exchange de Rabbit
 
-def emit_event(routing_key: str, body: dict):
-    """
-    ## Funcion emit_event
+#     ## Args:
+#         routing_key (str): La clave de enrutamiento del evento
+#         body (dict): El cuerpo del evento
 
-    ## Emite un evento a un exchange de Rabbit
+#     Returns:
+#         None
 
-    ## Args:
-        routing_key (str): La clave de enrutamiento del evento
-        body (dict): El cuerpo del evento
-
-    Returns:
-        None
-
-    """
-    try:
-        channel.basic_publish(
-            exchange=rabbitmq_config['exchange'],
-            routing_key=routing_key,
-            body=json.dumps(body)
-        )
-        logger.info(f"Evento emitido: {routing_key}")
-    except Exception as e:
-        logger.error(f"Error al emitir evento: {e}")
+#     """
+#     try:
+#         channel.basic_publish(
+#             exchange=rabbitmq_config['exchange'],
+#             routing_key=routing_key,
+#             body=json.dumps(body)
+#         )
+#         logger.info(f"Evento emitido: {routing_key}")
+#     except Exception as e:
+#         logger.error(f"Error al emitir evento: {e}")
 
 if __name__ == "__main__":
-    try: 
-        uvicorn.run(app, host="0.0.0.0", port=8000)
-    finally:
-        connection.close()
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # finally:
+    #     # connection.close()
 
 
 
@@ -185,7 +195,7 @@ def create_or_update_schedule(course_id: int, parallel_id: int, horario: Classes
                 "is_deleted": False,
                 "updated_at": datetime.now().isoformat()
             }
-            emit_event(event_routing_key, event_body)
+            #emit_event(event_routing_key, event_body)
 
             return {"message": "Horario actualizado con éxito", "schedule_id": existing_schedule['id']}
 
@@ -216,7 +226,7 @@ def create_or_update_schedule(course_id: int, parallel_id: int, horario: Classes
                 "created_at": datetime.now().isoformat(),
                 "updated_at": datetime.now().isoformat()
             }
-            emit_event(event_routing_key, event_body)
+            #emit_event(event_routing_key, event_body)
 
             return {"message": "Horario creado con éxito", "schedule_id": new_schedule_id}
 
@@ -308,7 +318,7 @@ def update_schedule(course_id: int, parallel_id: int, schedule_id: int, horario:
             "is_deleted": False,
             "updated_at": datetime.now().isoformat()
         }
-        emit_event(event_routing_key, event_body)
+        #emit_event(event_routing_key, event_body)
 
         return {"message": "Horario actualizado con éxito"}
     except mysql.connector.Error as err:
@@ -373,7 +383,7 @@ def delete_schedule(course_id: int, parallel_id: int, schedule_id: int):
             "is_deleted": True,
             "deleted_at": datetime.now().isoformat()
         }
-        emit_event(event_routing_key, event_body)
+        #emit_event(event_routing_key, event_body)
 
         return {"message": "Horario eliminado con exito (soft delete)"}
     except mysql.connector.Error as err:
