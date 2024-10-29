@@ -103,7 +103,7 @@ class EnrollmentCRUD:
                 self.db.commit()
         return None
     
-    def parallel_course(self, parallel_id):
+    def delete_parallel(self, parallel_id):
         enrollments = (
             self.db.query(Enrollment_model)
             .filter(Enrollment_model.parallel_id == parallel_id)
