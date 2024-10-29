@@ -34,7 +34,6 @@ class EnrollmentCRUD:
         return self.db.query(Enrollment_model).filter(
             Enrollment_model.student_id == student_id,
             Enrollment_model.course_id == course_id,
-            Enrollment_model.parallel_id == parallel_id,
             or_(
             Enrollment_model.is_active == "Inscrita",
             Enrollment_model.is_active == "Pendiente"

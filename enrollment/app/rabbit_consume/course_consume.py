@@ -51,6 +51,7 @@ def on_message(channel, method, properties, body):
             delete_parallel_records(entity_id)
         else:
             print(f"Clave de enrutamiento desconocida: {entity}")
+        
         # Acknowledge el mensaje
         channel.basic_ack(delivery_tag=method.delivery_tag)
         print(f"Mensaje procesado para {routing_key[0]}: {id}")

@@ -69,7 +69,7 @@ def create_enrollment(course_id: int, parallel_id: int, enrollment_request: Enro
      # Verificar si el estudiante ya está inscrito en el curso y paralelo
     existing_enrollment = crud.get_enrollment_by_student_and_course(enrollment_request.student_id, course_id, parallel_id)
     if existing_enrollment:
-        raise HTTPException(status_code=400, detail="El estudiante ya está inscrito en este curso y paralelo")
+        raise HTTPException(status_code=400, detail="El estudiante ya está inscrito en este curso")
     # Crear la inscripción
     enrollment_data = crud.create_enrollment(course_id, parallel_id, enrollment_request)
     # Enviar notificación a RabbitMQ

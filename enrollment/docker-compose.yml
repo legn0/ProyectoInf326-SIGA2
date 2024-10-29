@@ -35,11 +35,11 @@ services:
     networks:
       - rabbitmq
 
-  rabbit-consumer:
-    build:
-      context: .
-      dockerfile: ./app/rabbit_consume/Dockerfile
-    networks:
-      - rabbitmq
+  #rabbit-consumer:
+    #build:
+      #context: .
+      #dockerfile: ./app/rabbit_consume/Dockerfile
+    #networks:
+      #- rabbitmq
 volumes:
   mysql_data:
