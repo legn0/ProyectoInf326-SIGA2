@@ -39,6 +39,14 @@ spec:
             - name: pvc
               mountPath: /data/db
               subPath: enrollment-mysql-app
+          
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 100m
+            limits:
+              memory: 200Mi
+              cpu: 300m
       volumes:
         - name: pvc
           persistentVolumeClaim:

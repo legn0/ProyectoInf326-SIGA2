@@ -22,3 +22,10 @@ spec:
 
         - secretRef:
             name: enrollment-secrets
+        resources:
+            requests:
+              memory: 80Mi
+              cpu: 40m
+            limits:
+              memory: 256Mi
+              cpu: 200m

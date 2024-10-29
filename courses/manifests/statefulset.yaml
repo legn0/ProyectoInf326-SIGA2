@@ -39,6 +39,7 @@ spec:
             - name: pvc
               mountPath: /data/db
               subPath: courses-mysql-app
+
       volumes:
         - name: pvc
           persistentVolumeClaim:
