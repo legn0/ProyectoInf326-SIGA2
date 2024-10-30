@@ -3,6 +3,20 @@ import json
 from app.crud.crud import EnrollmentCRUD
 from app.database.database import SessionLocal
 
+def create_parallel_records(parallel_id, course_id):
+    """
+    Crea los registros del paralelo en la base de datos.
+    """
+    db = SessionLocal() 
+    try:
+        crud = EnrollmentCRUD(db)
+        crud.create_parallel(parallel_id, course_id)
+        print(f"Paralelo con ID {parallel_id} ecreado correctamente.")
+    except Exception as e:
+        print(f"Error creando el curso con ID {course_id} y paralelo con ID {parallel_id}: {e}")
+    finally:
+        db.close()
+
 def delete_course_records(course_id):
     """
     Elimina los registros del curso en la base de datos.
@@ -43,14 +57,18 @@ def on_message(channel, method, properties, body):
         routing_key = method.routing_key.split('.')
         entity = routing_key[0]
         entity_id = int(routing_key[1])
+        entity_crud = routing_key[2]
 
         # Llama a la función de eliminación correspondiente
-        if entity == "course":
-            delete_course_records(entity_id)
-        elif entity == "parallel":
-            delete_parallel_records(entity_id)
+        if entity_crud == "created":
+            create_parallel_records(entity_id, int(message.get("curso.id")))
         else:
-            print(f"Clave de enrutamiento desconocida: {entity}")
+            if entity == "course":
+                delete_course_records(entity_id)
+            elif entity == "parallel":
+                delete_parallel_records(entity_id)
+            else:
+                print(f"Clave de enrutamiento desconocida: {entity}")
         
         # Acknowledge el mensaje
         channel.basic_ack(delivery_tag=method.delivery_tag)
@@ -81,6 +99,7 @@ def consume_rabbitmq_messages():
         queue = channel.queue_declare(queue='enrollment_queue', durable=True)
         queue_name = queue.method.queue
 
+        channel.queue_bind(exchange='courses', queue=queue_name, routing_key='parallel.*.created')
         channel.queue_bind(exchange='courses', queue=queue_name, routing_key='course.*.deleted')
         channel.queue_bind(exchange='courses', queue=queue_name, routing_key='parallel.*.deleted')
 
