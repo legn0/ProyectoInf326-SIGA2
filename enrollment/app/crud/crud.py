@@ -117,10 +117,18 @@ class EnrollmentCRUD:
             self.db.query(Enrollment_model)
             .filter(Enrollment_model.course_id == course_id)
         ).all()
-        print(enrollments)
+        courses_deleted = (
+            self.db.query(Parallel_data)
+            .filter(Parallel_data.course_id == course_id)
+        ).all()
         if enrollments:
             for enrollment in enrollments:
                 enrollment.is_active = "Eliminada"
+                self.db.commit()
+
+        if courses_deleted:
+            for courses in courses_deleted:
+                courses.is_deleted = True
                 self.db.commit()
         return None
     
@@ -129,9 +137,17 @@ class EnrollmentCRUD:
             self.db.query(Enrollment_model)
             .filter(Enrollment_model.parallel_id == parallel_id)
         ).all()
+        parallel_deleted = (
+            self.db.query(Parallel_data)
+            .filter(Parallel_data.parallel_id == parallel_id)
+        ).all()
         
         if enrollments:
             for enrollment in enrollments:
                 enrollment.is_active = "Eliminada"
+                self.db.commit()
+        if parallel_deleted:
+            for parallel in parallel_deleted:
+                parallel.is_deleted = True
                 self.db.commit()
         return None

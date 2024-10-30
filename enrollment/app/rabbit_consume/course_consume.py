@@ -61,7 +61,7 @@ def on_message(channel, method, properties, body):
 
         # Llama a la función de eliminación correspondiente
         if entity_crud == "created":
-            create_parallel_records(entity_id, int(message.get("curso.id")))
+            create_parallel_records(entity_id, message["curso"]["id"])
         else:
             if entity == "course":
                 delete_course_records(entity_id)

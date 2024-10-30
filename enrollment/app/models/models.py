@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, DateTime, String, Bool
+from sqlalchemy import Column, Integer, DateTime, String, Boolean
 from sqlalchemy.sql import func
 from ..database.database import Base
 
@@ -18,4 +18,4 @@ class Parallel_data(Base):
     id = Column(Integer, primary_key=True, index=True)
     course_id = Column(Integer, index=True)
     parallel_id = Column(Integer, index=True)
-    is_deleted = Column(Bool, default="False") 
+    is_deleted = Column(Boolean, default=False) 
