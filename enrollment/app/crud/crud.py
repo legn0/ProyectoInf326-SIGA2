@@ -90,6 +90,17 @@ class EnrollmentCRUD:
             return enrollment
         return None
     
+    def get_course_and_parallel(self, course_id: int, parallel_id: int):
+        return (
+            self.db.query(Parallel_data)
+            .filter(
+                Parallel_data.course_id == course_id,
+                Parallel_data.parallel_id == parallel_id,
+                Parallel_data.is_deleted == False
+            )
+            .first()
+        )
+    
     def create_parallel(self, parallel_id: int, course_id: int):
         new_parallel = Parallel_data(
             course_id = course_id,
