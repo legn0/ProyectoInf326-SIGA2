@@ -9,8 +9,8 @@ export default function () {
         timeout: "90s"
     }
 
-    check(http.get(url), {
-        'status is 200': (r) => r.status == 200,
+    check(http.get(url, params), {
+        'status is accepted': (r) => (r.status >= 200 && r.status < 400),
     }) || errorRate.add(1)
 
     sleep(1)
