@@ -10,10 +10,14 @@ import os
 
 router = APIRouter()
 
+RABBIT_USER = os.getenv("RABBIT_USER")
+RABBIT_PASSWORD = os.getenv("RABBIt_PASSWORD")
+RABBIT_NAME = os.getenv("RABBIT_NAME")
+
 def notify_event(event: str, body: str):
     """Función para enviar un mensaje a RabbitMQ."""
-    credentials = pika.PlainCredentials('guest', 'guest')
-    connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq', credentials=credentials))
+    credentials = pika.PlainCredentials(RABBIT_USER, RABBIT_PASSWORD)
+    connection = pika.BlockingConnection(pika.ConnectionParameters(RABBIT_NAME, credentials=credentials))
     channel = connection.channel()
     
     channel.exchange_declare(exchange="enrollment",

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: enrollment-loadbalancer
+spec:
+  selector:
+    app: enrollment-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8002
+  type: LoadBalancer

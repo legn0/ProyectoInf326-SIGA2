@@ -5,9 +5,15 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
+SQLALCHEMY_DATABASE = os.getenv("SQLALCHEMY_DATABASE_URL")
+SQL_DB = os.getenv("MYSQL_DATABASE")
+SQL_USR = os.getenv("MYSQL_USER")
+SQL_PWRD = os.getenv("MYSQL_PASSWORD")
+SQL_PORT = os.getenv("MYSQL_PORT")
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+SQL_URL = f"mysql://{SQL_USR}:{SQL_PWRD}@{SQLALCHEMY_DATABASE}:{SQL_PORT}/{SQL_DB}"
+
+engine = create_engine(SQL_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
