@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+   frontend:
+     build:
+       context: .
+       dockerfile: Dockerfile
+     volumes:
+       - ./:/react-docker:delegated
+       - /react-docker/node_modules
+     ports:
+       - 3000:3000
+     environment:
+      - CHOKIDAR_USEPOLLING=true # create-ui-app <= 5.x
+      - WATCHPACK_POLLING=true # create-ui-app >= 5.x
+      - FAST_REFRESH=false
+      - WDS_SOCKET_PORT=30000
