@@ -2,6 +2,12 @@ import pika
 import json
 from app.crud.crud import EnrollmentCRUD
 from app.database.database import SessionLocal
+import os
+
+RABBIT_USER = os.getenv("RABBIT_USER")
+RABBIT_PASSWORD = os.getenv("RABBIT_PASSWORD")
+RABBIT_NAME = os.getenv("RABBIT_NAME")
+
 
 def create_parallel_records(parallel_id, course_id):
     """
@@ -84,7 +90,7 @@ def consume_rabbitmq_messages():
     """
     try:
         connection = pika.BlockingConnection(
-            pika.URLParameters("amqp://guest:guest@rabbitmq:5672/%2f?heartbeat=600")
+            pika.URLParameters(f"amqp://{RABBIT_USER}:{RABBIT_PASSWORD}@{RABBIT_NAME}:5672/%2f?heartbeat=600")
         )
         channel = connection.channel()
 
