@@ -1,11 +1,20 @@
-FROM node:18
-# Set the working directory
-WORKDIR /react-docker
-# Copy app dependencies to container
-COPY ./package*.json ./
-# Add `/app/node_modules/.bin` to $PATH
-ENV PATH /app/node_modules/.bin:$PATH
-# Install dependencies
+# Usar una imagen oficial de Node.js como base
+FROM node:18-alpine
+
+# Establecer el directorio de trabajo dentro del contenedor
+WORKDIR /app
+
+# Copiar package.json y package-lock.json
+COPY package*.json ./
+
+# Instalar las dependencias del proyecto
 RUN npm install
-# Deploy app for local development
-CMD npm start --host 0.0.0.0 --port 3000 --disableHostCheck true
+
+# Copiar el resto del proyecto al contenedor
+COPY . .
+
+# Exponer el puerto que usa React
+EXPOSE 3000
+
+# Comando para iniciar la aplicación
+CMD ["npm", "start"]
