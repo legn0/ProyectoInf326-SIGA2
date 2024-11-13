@@ -62,33 +62,33 @@ const EnrollmentAlumnos = () => {
     };
 
     return (
-        <Box p={5}>
-            <Heading mb={5}>Inscripción de Ramos</Heading>
-            <Stack separator={<StackSeparator />} align="stretch" spacing={4} borderWidth={3} borderRadius="md" p={4} shadow="md">
+        <Box p={5} bg="white" width="65%" ml={0}>
+            <Heading mb={3} color="gray.800">Inscripción de Ramos</Heading>
+            <Stack separator={<StackSeparator />} align="stretch" spacing={4} borderWidth={3} borderRadius="md" p={4} shadow="md" maxHeight="40vh" overflowY="auto">
                 {ramos.map((ramo) => (
                     <Box key={ramo.id}>
-                        <HStack spacing={6} justify="space-between" align="center">
+                        <HStack spacing={4} justify="space-between" align="center">
                             {/* Información de cada ramo */}
-                            <Text flex={1} fontSize="xl" fontWeight="bold">
+                            <Text flex={1} fontSize="md" fontWeight="bold" color="gray.800">
                                 {ramo.codigo}
                             </Text>
-                            <Text flex={1} fontSize="md" color="gray.600">
+                            <Text flex={1} fontSize="md" color="gray.700">
                                 Inscritos: {ramo.inscritos}
                             </Text>
-                            <Text flex={1} fontSize="md" color="gray.500">
+                            <Text flex={1} fontSize="md" color="gray.700">
                                 Créditos: {ramo.creditos}
                             </Text>
 
                             {/* Menú para seleccionar el paralelo */}
                             <MenuRoot>
                                 <MenuTrigger asChild>
-                                    <Button variant="outline" size="sm">
-                                        Seleccionar Paralelo
+                                    <Button variant="outline" color="gray.800" backgroundColor="whiteAlpha.300" _hover={{ backgroundColor: "orange.300", color: "white" }}>
+                                        Paralelo
                                     </Button>
                                 </MenuTrigger>
-                                <MenuContent>
+                                <MenuContent backgroundColor="gray.100" borderRadius="md" boxShadow="md">
                                     {ramo.paralelos.map((paralelo) => (
-                                        <MenuItem key={paralelo.id} value={paralelo.numero} onClick={() => handleSelectParallel(ramo.id, paralelo.id)}>
+                                        <MenuItem key={paralelo.id} value={paralelo.numero} color="gray.800" backgroundColor="gray.100" _hover={{ backgroundColor: "orange.300", color: "white" }} onClick={() => handleSelectParallel(ramo.id, paralelo.id)}>
                                             {paralelo.numero}
                                         </MenuItem>
                                     ))}
@@ -96,10 +96,10 @@ const EnrollmentAlumnos = () => {
                             </MenuRoot>
 
                             {/* Botones para ver horario e inscribirse */}
-                            <Button colorScheme="blue" onClick={() => handleHorario(ramo.id)}>
+                            <Button variant="outline" color="gray.800" _hover={{ backgroundColor: "orange.300", color: "white" }} onClick={() => handleHorario(ramo.id)}>
                                 Ver Horario
                             </Button>
-                            <Button colorScheme="blue" onClick={() => handleInscribir(ramo.id)}>
+                            <Button variant="outline" color="gray.800" _hover={{ backgroundColor: "green.300", color: "white" }} onClick={() => handleInscribir(ramo.id)}>
                                 Inscribirse
                             </Button>
                         </HStack>
@@ -109,8 +109,8 @@ const EnrollmentAlumnos = () => {
 
             {HorariosRamo && HorariosRamo.length > 0 && (
                 <Box mt={10}>
-                    <Heading size="md" mb={3}>
-                        Horarios Seleccionados
+                    <Heading mb={3} color="gray.800">
+                        Horario Seleccionado
                     </Heading>
                     {HorariosRamo.map((horario) => (
                         <Horario key={horario.paralelo_id} horario={horario.horario} />
