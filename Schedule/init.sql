@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS horarios (
     parallel_id INT NOT NULL,
     bloque_id INT,
     tipo VARCHAR(50),
+    dia VARCHAR(50),
     id_profesor INT NOT NULL,
     nombre_profesor VARCHAR(50),
     is_deleted TINYINT(1) DEFAULT 0,
