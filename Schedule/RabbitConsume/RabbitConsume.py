@@ -10,25 +10,29 @@ import os
 import signal
 import sys
 import logging
+from time import sleep
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+db_config = {
+    'user': os.getenv('MYSQL_USER', 'root'),
+    'password': os.getenv('MYSQL_PASSWORD', 'admin'),
+    'host': os.getenv('SQLALCHEMY_DATABASE_URL', 'localhost'),
+    'database': os.getenv('MYSQL_DATABASE', 'horarios')
+}
+
 rabbitmq_config = {
-    'host': os.getenv('RABBITMQ_HOST', 'localhost'),
     'exchange': os.getenv('RABBITMQ_EXCHANGE', 'horario_events'),
     'exchange_type': os.getenv('RABBITMQ_EXCHANGE_TYPE', 'topic')
 }
 
-db_config = {
-    'user': os.getenv('DB_USER', 'root'),
-    'password': os.getenv('DB_PASSWORD', 'admin'),
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'database': os.getenv('DB_DATABASE', 'horarios')
-}
+RABBIT_USER = os.getenv("RABBIT_USER")
+RABBIT_PASSWORD = os.getenv("RABBIT_PASSWORD")
+RABBIT_NAME = os.getenv("RABBIT_NAME")
 
 
-def consume_event(cola, callback):
+def consume_event(cola, callback, connection):
     """
     Funcion consume_event
 
@@ -41,10 +45,12 @@ def consume_event(cola, callback):
     Returns:
         None
     """
+
+    
+
     try:
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_config['host']))
         channel = connection.channel()
-        channel.exchange_declare(exchange=cola, exchange_type=rabbitmq_config['exchange_type'])
+        channel.exchange_declare(exchange=cola, exchange_type=rabbitmq_config['exchange_type'])        
         result = channel.queue_declare(queue=cola, durable=True)
         queue_name = result.method.queue
         channel.queue_bind(exchange=cola, queue=queue_name, routing_key="*.*.*")
@@ -218,8 +224,26 @@ def signal_handler(sig, frame):
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
 
-    thread_cursos = threading.Thread(target=consume_event, args=("courses", process_event_cursos))
-    thread_users = threading.Thread(target=consume_event, args=("users", process_event_users))
+
+    tries = 0
+    opened = False
+    connection = None
+    while tries < 20 and not opened:
+        try:
+            connection = pika.BlockingConnection(pika.URLParameters(f"amqp://{RABBIT_USER}:{RABBIT_PASSWORD}@{RABBIT_NAME}:5672/%2f"))
+            
+        except Exception as e:
+            logger.error(f"Failed to connect to RabbitMQ: {e}")
+            tries += 1
+            sleep(5)
+            continue
+        opened = True
+
+    if connection == None:
+        logger.error("Por algun motivo no me conecto con rabbit")
+
+    thread_cursos = threading.Thread(target=consume_event, args=("courses", process_event_cursos, connection))
+    thread_users = threading.Thread(target=consume_event, args=("users", process_event_users, connection))
 
     thread_cursos.start()
     thread_users.start()

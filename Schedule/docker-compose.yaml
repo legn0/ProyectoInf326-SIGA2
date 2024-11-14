@@ -1,3 +1,6 @@
+networks:
+  rabbitmq:
+    name: rabbitmq
 
 services:
   mysql-container:
@@ -17,28 +20,15 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-    healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+    networks:
+      - rabbitmq
 
   fastapi:
-    build: 
-      context: .
-      dockerfile: ./API/Dockerfile  
-    command: uvicorn API:app --reload --host 0.0.0.0 --port 8000 
+    container_name: schedule-app
+    image: schedule-img  
+    command: uvicorn API:app --reload --host 0.0.0.0 --port 8001 
     ports:
-      - '8001:8000'
+      - '8001:8001'
     volumes:
       - .:/app
     environment:
@@ -52,13 +42,8 @@ services:
     depends_on:
       mysql-container: 
         condition: service_healthy  # Asegúrate de que el contenedor de MySQL esté saludable
-      rabbitmq:
-        condition: service_healthy  # Asegúrate de que RabbitMQ esté saludable
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+    networks:
+      - rabbitmq
 
   consumer:
     build: 
@@ -78,10 +63,11 @@ services:
     depends_on:
       mysql-container: 
         condition: service_healthy  # Asegúrate de que el contenedor de MySQL esté saludable
-      rabbitmq:
-        condition: service_healthy  # Asegúrate de que RabbitMQ esté saludable
       fastapi:
-        condition: service_healthy  # Asegúrate de que el contenedor de FastAPI esté saludable
+        condition: service_started  # Asegúrate de que el contenedor de FastAPI esté saludable
+
+    networks:
+      - rabbitmq
 
 volumes:
   db_data:
