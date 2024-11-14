@@ -13,7 +13,8 @@ const EnrollmentAlumnos = () => {
         { id: 5, nombre: "Historia", codigo: "HIS105", creditos: 4, inscritos: "23/35", paralelos: [{ id: 9, numero: 200 }, { id: 10, numero: 201 }] },
     ]);
 
-    const [HorariosRamo, setHorariosRamo] = useState({});
+    const [HorariosRamo, setHorariosRamo] = useState(null);
+
     const [selectedParallels, setSelectedParallels] = useState([
         {cursoId: 1, paraleloId: 1},
         {cursoId: 2, paraleloId: 3},
@@ -57,8 +58,9 @@ const EnrollmentAlumnos = () => {
     const handleHorario = (cursoId) => {
         const view_parallel = selectedParallels.filter((h) => h.cursoId === cursoId)
         const horario = Horariosdb.filter((h) => h.curso_id === cursoId && h.paralelo_id === view_parallel[0].paraleloId);
-        console.log(view_parallel[0].paraleloId, horario)
-        setHorariosRamo(horario);
+        const ramo = ramos.filter((h) => h.id === cursoId)
+
+        setHorariosRamo({codigo: ramo[0].codigo, ...horario[0]});
     };
 
     return (
@@ -107,14 +109,9 @@ const EnrollmentAlumnos = () => {
                 ))}
             </Stack>
 
-            {HorariosRamo && HorariosRamo.length > 0 && (
+            {HorariosRamo && (
                 <Box mt={10}>
-                    <Heading mb={3} color="gray.800">
-                        Horario Seleccionado
-                    </Heading>
-                    {HorariosRamo.map((horario) => (
-                        <Horario key={horario.paralelo_id} horario={horario.horario} />
-                    ))}
+                    <Horario horario={HorariosRamo} />
                 </Box>
             )}
         </Box>
