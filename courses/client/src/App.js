@@ -2,31 +2,24 @@ import logo from './logo.svg';
 import './App.css';
 import { Box } from '@chakra-ui/react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ChakraProvider } from "@chakra-ui/react";
-
-// Componentes
-import NavBar from './Components/NavBar'; // Asegúrate de que el `NavBar` esté exportado como `default` en su archivo
 
 // Pages
-import { VistaCursos } from './Pages/VistaCursos';
+import VistaCursos from './Pages/VistaCursos'; // Sin llaves, ya que es exportación por defecto
 
 function App() {
   return (
-    <ChakraProvider>
-      <BrowserRouter>
-        <div className="app">
-          {/* Incluye NavBar aquí */}
-          <NavBar />
-          <div className="app__page">
-            <Routes>
-              <Route path="/" element={<VistaCursos />} />
-            </Routes>
-          </div>
+    <BrowserRouter>
+      <div className='app'>
+        <div className='app__page'>
+          <Routes>
+            <Route path='/' element={<VistaCursos />} />
+          </Routes>
         </div>
-      </BrowserRouter>
-    </ChakraProvider>
+      </div>
+    </BrowserRouter>
   );
 }
 
 export default App;
+
 
