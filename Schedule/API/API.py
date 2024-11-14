@@ -14,7 +14,7 @@ descripcion = """
 API para la gestión de horarios de clases en la universidad USM, parte del modulo cursos.
 
 ## Funciones:
-
+-
 - Crear un nuevo horario para un paralelo específico
 - Actualizar la información de un horario existente
 - Eliminar (soft delete) un horario existente
