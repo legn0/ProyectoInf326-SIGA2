@@ -39,7 +39,7 @@ const Horario = ({ horario, width=100, height=30}) => {
     }
 
     return (
-    <Box bg="white" borderRadius="md" p={5} boxShadow="md" borderWidth={3}>
+    <Box bg="white" borderRadius="md" p={5} boxShadow="md" borderWidth={3} maxHeight="40vh" overflowY="auto">
         <HStack align="start" spacing={4}>
             <VStack spacing={4} align="stretch">
                 <Text fontWeight="bold" textAlign="center" color="gray.800">
