@@ -4,7 +4,7 @@ metadata:
   name: courses-hpa
 spec:
   scaleTargetRef:
-    apiVersion: app/v1
+    apiVersion: apps/v1
     kind: Deployment
     name: courses-app
   minReplicas: 1
@@ -15,4 +15,4 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 60
+        averageUtilization: 70

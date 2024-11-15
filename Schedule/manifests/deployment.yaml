@@ -22,11 +22,11 @@ spec:
 
         - secretRef:
             name: schedule-secrets
-      
-      - name: schedule-rabbit-consume-container
-        image: ttl.sh/schedule-rabbit-consume-img:8h
-        imagePullPolicy: "Always"
-        envFrom:
+        resources:
+          requests:
+            memory: 80Mi
+            cpu: 40m
+          limits:
+            memory: 256Mi
+            cpu: 200m
 
-          - secretRef:
-              name: schedule-consume-secrets

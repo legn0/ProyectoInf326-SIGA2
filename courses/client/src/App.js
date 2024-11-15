@@ -1,7 +1,5 @@
-import logo from './logo.svg';
 import './App.css';
-import { Box } from '@chakra-ui/react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import {BrowserRouter, Routes, Route} from 'react-router-dom'
 
 // Pages
 import VistaCursos from './Pages/VistaCursos'; // Sin llaves, ya que es exportación por defecto

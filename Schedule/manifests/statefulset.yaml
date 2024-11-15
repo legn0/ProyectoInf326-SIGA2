@@ -39,16 +39,15 @@ spec:
             - name: pvc
               mountPath: /data/db
               subPath: schedule-mysql-app
-            # - name: mysql-initdb
-            #   mountPath: /docker-entrypoint-initdb.d
-            #   subPath: init.sql
+            - name: mysql-initdb
+              mountPath: /docker-entrypoint-initdb.d
       volumes:
         - name: pvc
           persistentVolumeClaim:
             claimName: schedule-mysql-pvc
-        # - name: mysql-initdb
-        #   configMap:
-        #     name: schedule-mysql-config
+        - name: mysql-initdb
+          configMap:
+            name: schedule-mysql-config
 
 ---
 
