@@ -18,12 +18,29 @@ import {
   Wrap,
 } from "@chakra-ui/react";
 
-export const PopUpFormCurso = ({ isOpen, onClose }) => {
+export const PopUpFormCurso = ({ isOpen, onClose, crearCurso }) => {
   const [ramos, setRamos] = useState([]);
   const [inputValue, setInputValue] = useState("");
+  const [nuevoCurso, setNuevoCurso] = useState({
+    sigla: "",
+    nombre: "",
+    departamento: "",
+  });
+
+  const handleSiglaChange = (event) => {
+    setNuevoCurso({ ...nuevoCurso, sigla: event.target.value });
+  };
+
+  const handleNombreChange = (event) => {
+    setNuevoCurso({ ...nuevoCurso, nombre: event.target.value });
+  };
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
+  };
+
+  const handleDepartamentoChange = (event) => {
+    setNuevoCurso({ ...nuevoCurso, departamento: event.target.value });
   };
 
   const handleKeypress = (event) => {
@@ -60,15 +77,15 @@ export const PopUpFormCurso = ({ isOpen, onClose }) => {
         <ModalBody pt={10}>
           <FormControl pt={3} isRequired>
             <FormLabel>Sigla</FormLabel>
-            <Input />
+            <Input onChange={handleSiglaChange} />
           </FormControl>
           <FormControl pt={3} isRequired>
             <FormLabel>Nombre</FormLabel>
-            <Input />
+            <Input onChange={handleNombreChange} />
           </FormControl>
           <FormControl pt={3} isRequired>
             <FormLabel>Departamento</FormLabel>
-            <Input />
+            <Input onChange={handleDepartamentoChange} />
           </FormControl>
 
           <FormControl>
@@ -97,7 +114,8 @@ export const PopUpFormCurso = ({ isOpen, onClose }) => {
           <Button
             mr={5}
             onClick={() => {
-              console.log("placeholder");
+              setNuevoCurso({ ...nuevoCurso, prerequisitos: ramos.toString() });
+              crearCurso(nuevoCurso);
               cancelClose();
             }}
             colorScheme="blue">

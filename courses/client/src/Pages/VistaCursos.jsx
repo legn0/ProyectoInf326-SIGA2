@@ -1,50 +1,86 @@
-import React from "react";
-import { Box, useDisclosure, Button } from "@chakra-ui/react";
-import PopUpConsulta from "../Components/PopUpConsulta";
-import PopUpFormParalelo from "../Components/PopUpFormParalelo";
-import PopUpFormCurso from "../Components/PopUpFormCurso";
+import {React, useState} from "react";
+import Navbar from "../Components/NavBar";
+import AcorcionCursos from "../Components/Accordion";
 
 export const VistaCursos = () => {
-  const paralelo1 = {
-    curso: "inf285",
-    paralelo: 200,
-    limite_cupo: 60,
-    jornada: "Diurna",
-    campus_sede: "San Joaquin",
-  };
+  const [paralelos, setParalelos] = useState([
+    {
+      curso: "fis120",
+      paralelo: 200,
+      limite_cupo: 60,
+      jornada: "Diurna",
+      campus_sede: "San Joaquin",
+    },
+    {
+      curso: "fis120",
+      paralelo: 201,
+      limite_cupo: 80,
+      jornada: "Diurna",
+      campus_sede: "San Joaquin"
+    },
+    {
+      curso: "inf326",
+      paralelo: 200,
+      limite_cupo: 70,
+      jornada: "Diurna",
+      campus_sede: "Casa Central",
+    },
+  ]);
 
-  const disclosureCosulta = useDisclosure(false);
-  const disclosureFormParalelo = useDisclosure(false);
-  const disclosureFormCurso = useDisclosure(false);
+  const [cursos, setCursos] = useState([
+    {
+      sigla: "inf232",
+      nombre: "Curso oka",
+      departamento: "informatica",
+      prerequisitos: "",
+    },
+    {
+      sigla: "inf326",
+      nombre: "Arquitectura de Software",
+      departamento: "informatica",
+      prerequisitos: "",
+    },
+    {
+      sigla: "mat021",
+      nombre: "Matematicas 1",
+      departamento: "matematica",
+      prerequisitos: "",
+    },
+    {
+      sigla: "mat022",
+      nombre: "Matematicas 2",
+      departamento: "matematica",
+      prerequisitos: "mat021",
+    },
+    {
+      sigla: "mat023",
+      nombre: "Matematicas 3",
+      departamento: "matematica",
+      prerequisitos: "mat022",
+    },
+    {
+      sigla: "fis120",
+      nombre: "Fisica General 2",
+      departamento: "fisica",
+      prerequisitos: "mat022",
+    },
+  ]);
+
+  const CrearParalelo = (paralelo) => {
+    setParalelos([...paralelos, paralelo]);
+  }
+
+  const CrearCurso = (curso) => {
+    setCursos([...cursos, curso]);
+  }
 
   return (
     <>
-      <Box> Ola soy un placeholder del nav bar</Box>
+      <Navbar />
 
-      <Button onClick={disclosureCosulta.onOpen}>
-        ola borrar Ver Paralelo
-      </Button>
-      <Button onClick={disclosureFormParalelo.onOpen}>
-        ola borrar Crear Paralelo
-      </Button>
-      <Button onClick={disclosureFormCurso.onOpen}>
-        ola borrar Crear Curso
-      </Button>
-
-      <PopUpConsulta
-        dataParalelo={paralelo1}
-        isOpen={disclosureCosulta.isOpen}
-        onClose={disclosureCosulta.onClose}
-      />
-      <PopUpFormParalelo
-        dataCurso={paralelo1}
-        isOpen={disclosureFormParalelo.isOpen}
-        onClose={disclosureFormParalelo.onClose}
-      />
-      <PopUpFormCurso
-        isOpen={disclosureFormCurso.isOpen}
-        onClose={disclosureFormCurso.onClose}
-      />
+      <AcorcionCursos cursos={cursos} paralelos={paralelos} crearCurso={CrearCurso} crearParalelo={CrearParalelo}/>
+      
+      
     </>
   );
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import { React, useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -16,7 +16,31 @@ import {
   Button,
 } from "@chakra-ui/react";
 
-export const PopUpFormParalelo = ({ dataCurso, isOpen, onClose }) => {
+export const PopUpFormParalelo = ({ dataCurso, isOpen, onClose, crearParalelo }) => {
+  const [nuevoParalelo, setNuevoParalelo] = useState({
+    curso: dataCurso.sigla,
+    paralelo: -1,
+    limite_cupo: -1,
+    jornada: "Diurna",
+    campus_sede: "San Joaquin",
+  });
+
+  const handleParaleloChange = (event) => {
+    setNuevoParalelo({ ...nuevoParalelo, paralelo: event.target.value });
+  };
+
+  const handleLimiteChange = (event) => {
+    setNuevoParalelo({ ...nuevoParalelo, limite_cupo: event.target.value });
+  };
+
+  const handleJornadaChange = (event) => {
+    setNuevoParalelo({ ...nuevoParalelo, jornada: event.target.value });
+  };
+
+  const handleCampusChange = (event) => {
+    setNuevoParalelo({ ...nuevoParalelo, campus_sede: event.target.value });
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -32,8 +56,8 @@ export const PopUpFormParalelo = ({ dataCurso, isOpen, onClose }) => {
           </Heading>
           <FormControl isRequired>
             <FormLabel>Numero Paralelo</FormLabel>
-            <NumberInput defaultValue={200}>
-              <NumberInputField />
+            <NumberInput defaultValue={200} >
+              <NumberInputField onChange={handleParaleloChange}/>
             </NumberInput>
           </FormControl>
         </ModalHeader>
@@ -41,25 +65,25 @@ export const PopUpFormParalelo = ({ dataCurso, isOpen, onClose }) => {
         <ModalBody pt={10}>
           <FormControl pt={3} isRequired>
             <FormLabel>Limite de Cupo</FormLabel>
-            <NumberInput defaultValue={60}>
-              <NumberInputField />
+            <NumberInput defaultValue={60} >
+              <NumberInputField onChange={handleLimiteChange}/>
             </NumberInput>
           </FormControl>
           <FormControl pt={3} isRequired>
             <FormLabel>Jornada</FormLabel>
-            <Select>
-              <option value={0}>Diurna</option>
-              <option value={1}>Vespertina</option>
+            <Select onChange={handleJornadaChange}>
+              <option value={"Diurna"}>Diurna</option>
+              <option value={"Vespertina"}>Vespertina</option>
             </Select>
           </FormControl>
           <FormControl pt={3} isRequired>
             <FormLabel>Campus/Sede</FormLabel>
-            <Select>
-              <option>Casa Central</option>
-              <option>San Joaquin</option>
-              <option>Viña del Mar</option>
-              <option>Vitacura</option>
-              <option>Concepcion</option>
+            <Select onChange={handleCampusChange}>
+              <option value={"Casa Central"}>Casa Central</option>
+              <option value={"San Joaquin"}>San Joaquin</option>
+              <option value={"Viña del Mar"}>Viña del Mar</option>
+              <option value={"Vitacura"}>Vitacura</option>
+              <option value={"Concepcion"}>Concepcion</option>
             </Select>
           </FormControl>
         </ModalBody>
@@ -67,7 +91,7 @@ export const PopUpFormParalelo = ({ dataCurso, isOpen, onClose }) => {
           <Button
             mr={5}
             onClick={() => {
-              console.log("placeholder");
+              crearParalelo(nuevoParalelo);
               onClose();
             }}
             colorScheme="blue">
