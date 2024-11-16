@@ -6,31 +6,35 @@ export const EditSchedule = () => {
     const [courseId, setCourseId] = useState('');
     const [parallelId, setParallelId] = useState('');
     const [professorId, setProfessorId] = useState('');
+    const [professorName, setProfessorName] = useState('');
     const [classType, setClassType] = useState('');
     const [selected, setSelected] = useState({});
+    const [defaultOptionText] = useState('Seleccione una opción');
 
     const handleCourseIdChange = (event) => {
         setCourseId(event.target.value);
-      };
+    };
 
     const handleParallelIdChange = (event) => {
         setParallelId(event.target.value);
-      };
+    };
     
     const handleProfessorIdChange = (event) => {
         setProfessorId(event.target.value);
-        };
-
+    };
+    const handleProfessorNameChange = (event) => {
+        setProfessorName(event.target.value);
+    };
     const handleClassTypeChange = (event) => {
         setClassType(event.target.value);
     };
     
-    const handleSelect = (day, hour) => {
-        setSelected((prevSelected) => ({
+    const handleSelect = (day, hour, rowIndex, colIndex) => {
+        setSelected(prevSelected => ({
             ...prevSelected,
             [day]: {
                 ...prevSelected[day],
-                [hour]: !prevSelected[day]?.[hour]
+                [hour]: prevSelected[day]?.[hour] ? null : { rowIndex, colIndex }
             }
         }));
     };
@@ -38,19 +42,25 @@ export const EditSchedule = () => {
         const selectedItems = [];
         for (const day in selected) {
           for (const hour in selected[day]) {
+            const selection = selected[day][hour];
             if (selected[day][hour]) {
-              selectedItems.push({ day, hour });
+                const id_bloque = selection.colIndex * 10 + selection.rowIndex +1;
+                selectedItems.push({
+                    id_bloque: parseInt(id_bloque, 10),
+                    nombre_bloque: hour, // Assuming courseName is the block name
+                    tipo: classType,
+                    id_profesor: parseInt(professorId,10),
+                    nombre_profesor: professorName, // Replace with actual professor name if available
+                    dia: day
+                });
             }
           }
         }
-        const data = { 
-          classType,
-          professorId,
-          schedule: selectedItems
-        };
+        const data = selectedItems;
+        console.log('Data to be sent:', data); // Log the data to verify its structure
     
         try {
-          const response = await fetch(`/api/v1/courses/${courseId}/parallels/${parallelId}/schedules`, {
+          const response = await fetch(`http://127.0.0.1:8000/api/v1/courses/${parseInt(courseId,10)}/parallels/${parseInt(parallelId,10)}/schedules`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -60,58 +70,77 @@ export const EditSchedule = () => {
     
           if (response.ok) {
             console.log('Data submitted successfully');
+            alert('Datos guardados exitosamente!'); // Show success message
+            window.location.reload(); // Refresh the page
           } else {
-            console.error('Failed to submit data');
+            console.error('Fallo al enviar datos:', response);
+            alert(`Fallo al enviar datos: ${response}`); // Show error message
           }
         } catch (error) {
-          console.error('Error:', error);
+            console.error('Error:', error);
+            alert(`Error al conectarse con API: ${error.message}`); // Show error message
+            window.location.reload(); // Refresh the page
+
+
         }
       };
 
-    const selectedItems = [];
-    for (const day in selected) {
-        for (const hour in selected[day]) {
-            if (selected[day][hour]) {
-                selectedItems.push(`${day} ${hour}`);
-            }
-        }
-    }
+      const selectedItems = [];
+      for (const day in selected) {
+          for (const hour in selected[day]) {
+              const selection = selected[day][hour];
+              if (selection) {
+                  selectedItems.push(`${day} ${hour} Id Bloque: ${selection.colIndex * 10 + selection.rowIndex +1}`);
+              }
+          }
+      }
     
 
     return (
     <>
         <div className="app">
-            <h1 className='Titulo'> SIGA  </h1>
-            <h3 style={{textAlign:'left', margin: '10px'}}> Id Curso: 
-            <input 
-                type="text" 
-                value={courseId} 
-                onChange={handleCourseIdChange} 
-                style={{margin: '10px'}}
-            />
-            </h3>
-            <h3 style={{textAlign:'left', margin: '10px'}}> Id Paralelo: 
-            <input 
-                type="text" 
-                value={parallelId} 
-                onChange={handleParallelIdChange} 
-                style={{margin: '10px'}}
-            />
-            </h3>
-            <h3 style={{textAlign:'left', margin: '10px'}}> ID Profesor: 
-            <input 
-                type="text" 
-                value={professorId} 
-                onChange={handleProfessorIdChange} 
-                style={{margin: '10px'}}
-            />
-            </h3>
-            <h3 style={{textAlign:'left', margin: '10px'}}> Tipo de Clase: 
-            <select style={{margin: '10px'}} value={classType} onChange={handleClassTypeChange}>
-                <option value="Catedra">Catedra</option>
-                <option value="Ayudantia">Ayudantia</option>
-            </select></h3>
+            <h1 className='Titulo'> SIGA NUEVO  😎</h1>
             <div className='container'>
+                            <div>
+                <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> Id Curso: 
+                <input 
+                    type="text" 
+                    value={courseId} 
+                    onChange={handleCourseIdChange} 
+                    style={{margin: '10px', width: '100px'}}
+                />
+                </h4>
+                <h4> Id Paralelo: 
+                <input 
+                    type="text" 
+                    value={parallelId} 
+                    onChange={handleParallelIdChange} 
+                    style={{margin: '10px', width: '100px'}}
+                />
+                </h4>
+                <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> Nombre Profesor: 
+                <input 
+                    type="text" 
+                    value={professorName} 
+                    onChange={handleProfessorNameChange} 
+                    style={{margin: '10px', width: '100px'}}
+                />
+                </h4>
+                <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> ID Profesor: 
+                <input 
+                    type="text" 
+                    value={professorId} 
+                    onChange={handleProfessorIdChange} 
+                    style={{margin: '10px', width: '100px'}}
+                />
+                </h4>
+                <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> Tipo de Clase: 
+                <select style={{ margin: '10px', maxHeight: '100px', overflowY: 'auto' }} value={classType} onChange={handleClassTypeChange}>
+                    <option value="" disabled>{defaultOptionText}</option>
+                    <option value="Catedra">Catedra</option>
+                    <option value="Ayudantia">Ayudantia</option>
+                </select></h4>
+            </div>
                 <div className="selected-items">
                     <h2>Horarios elegidos</h2>
                     <ul>
@@ -125,18 +154,18 @@ export const EditSchedule = () => {
                 <thead>
                     <tr>
                         <th>Hora</th>
-                        {days.map((day) => (<th key={day}>{day}</th> ))}
+                        {days.map((day, dayIndex) => (<th key={day}>{day}</th> ))}
                     </tr>
                 </thead>
                     <tbody>
-                        {hours.map((hour) => (
+                        {hours.map((hour, rowIndex) => (
                             <tr key={hour}>
                                 <td>{hour}</td>
-                                {days.map((day) => (
+                                {days.map((day, colIndex) => (
                                     <td key={day}>
                                         <button
                                             className={selected[day]?.[hour] ? 'selected' : ''}
-                                            onClick={() => handleSelect(day, hour)}>
+                                            onClick={() => handleSelect(day, hour, rowIndex, colIndex)}>
                                         </button>
                                     </td>
                                 ))}
@@ -145,7 +174,7 @@ export const EditSchedule = () => {
                     </tbody>
                 </table>
             </div>
-            <button onClick={handleSubmit} style={{margin: '10px'}}>Submit</button>
+            <button onClick={handleSubmit} className='button_submit'>Guardar</button>
         </div>
     </>
   )
