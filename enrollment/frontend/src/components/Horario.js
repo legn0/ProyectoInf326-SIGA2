@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 
 
-const Horario = ({ horario, width=100, height=30}) => {
+const Horario = ({ VerHorario, InscritosHorario, width=100, height=30 }) => {
 
     const cellWidth = `${width}px`;
     const cellHeight = `${height}px`;
@@ -24,17 +24,45 @@ const Horario = ({ horario, width=100, height=30}) => {
         bg: "whiteAlpha.300"
     }));
 
-    console.log(horario)
+    for(const horario of InscritosHorario){
+        for (const item of horario.horario){
+            const day = ScheduleDays.indexOf(item["dia"]);
+            const block = ScheduleBlocks.indexOf(item["bloque"]);
+    
+            if (day !== -1 && block !== -1) {
+                if(scheduleMatrix[day][block].bg != "whiteAlpha.300"){
+                    scheduleMatrix[day][block] = {
+                        Text: "TOPE",
+                        bg: "orange.600",
+                    };
+                }else{
+                    scheduleMatrix[day][block] = {
+                        Text: horario?.codigo || "",
+                        bg: "green.300",
+                    };
+                }
+            }
+        }
+    }
 
-    for (const item of horario.horario){
-        const day = ScheduleDays.indexOf(item["dia"]);
-        const block = ScheduleBlocks.indexOf(item["bloque"]);
-
-        if (day !== -1 && block !== -1) {
-            scheduleMatrix[day][block] = {
-                Text: horario?.codigo || "",
-                bg: "orange.300",
-            };
+    if(VerHorario){
+        for (const item of VerHorario.horario){
+            const day = ScheduleDays.indexOf(item["dia"]);
+            const block = ScheduleBlocks.indexOf(item["bloque"]);
+    
+            if (day !== -1 && block !== -1) {
+                if(scheduleMatrix[day][block].bg != "whiteAlpha.300"){
+                    scheduleMatrix[day][block] = {
+                        Text: "TOPE",
+                        bg: "orange.600",
+                    };
+                }else{
+                    scheduleMatrix[day][block] = {
+                        Text: VerHorario?.codigo || "",
+                        bg: "orange.300",
+                    };
+                }
+            }
         }
     }
 
@@ -86,6 +114,53 @@ const Horario = ({ horario, width=100, height=30}) => {
                     ))}
                 </VStack>
             ))}
+        </HStack>
+
+        <HStack mt={4}>
+            <Box
+                bg="green.300"
+                p={3}
+                textAlign="center"
+                borderWidth={1}
+                borderRadius="md"
+                h="30px"
+                w="100px"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+            >
+                <Text color="gray.800">Inscrita</Text>
+            </Box>
+
+            <Box
+                bg="orange.300"
+                p={3}
+                textAlign="center"
+                borderWidth={1}
+                borderRadius="md"
+                h="30px"
+                w="120px"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+            >
+                <Text color="gray.800">Ver Horario</Text>
+            </Box>
+
+            <Box
+                bg="orange.600"
+                p={3}
+                textAlign="center"
+                borderWidth={1}
+                borderRadius="md"
+                h="30px"
+                w="100px"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+            >
+                <Text color="gray.800">TOPE</Text>
+            </Box>
         </HStack>
     </Box>
   );

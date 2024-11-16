@@ -6,13 +6,13 @@ import Horario from "./Horario";
 const EnrollmentAlumnos = () => {
     // Datos ficticios de los ramos
     const [ramos, setRamos] = useState([
-        { id: 1, nombre: "Matemáticas", codigo: "MAT101", creditos: 5, inscritos: "12/30", estado: "Pendiente", paralelos: [{ id: 1, numero: 200 }, { id: 2, numero: 201 }] },
-        { id: 2, nombre: "Física", codigo: "FIS102", creditos: 4, inscritos: "29/30", estado: "Inscrita", paralelos: [{ id: 3, numero: 201 }, { id: 4, numero: 204 }] },
-        { id: 3, nombre: "Química", codigo: "QUI103", creditos: 6, inscritos: "15/15", estado: "Pendiente", paralelos: [{ id: 5, numero: 200 }, { id: 6, numero: 201 }] },
-        { id: 4, nombre: "Biología", codigo: "BIO104", creditos: 3, inscritos: "40/40", estado: "Inscrita", paralelos: [{ id: 7, numero: 202 }, { id: 8, numero: 207 }] },
-        { id: 5, nombre: "Historia", codigo: "HIS105", creditos: 4, inscritos: "23/35", estado: "Pendiente",paralelos: [{ id: 9, numero: 200 }, { id: 10, numero: 201 }] },
-        { id: 6, nombre: "Programacion", codigo: "PRO115", creditos: 5, inscritos: "29/35", estado: "Pendiente",paralelos: [{ id: 11, numero: 200 }, { id: 12, numero: 201 }] },
-        { id: 7, nombre: "Deporte", codigo: "DEP165", creditos: 2, inscritos: "34/35", estado: "Pendiente",paralelos: [{ id: 13, numero: 200 }, { id: 14, numero: 201 }] },
+        { id: 1, nombre: "Matemáticas", codigo: "MAT101", creditos: 5, inscritos: "12/30", paralelos: [{ id: 1, numero: 200 }, { id: 2, numero: 201 }] },
+        { id: 2, nombre: "Física", codigo: "FIS102", creditos: 4, inscritos: "29/30", paralelos: [{ id: 3, numero: 201 }, { id: 4, numero: 204 }] },
+        { id: 3, nombre: "Química", codigo: "QUI103", creditos: 6, inscritos: "15/15", paralelos: [{ id: 5, numero: 200 }, { id: 6, numero: 201 }] },
+        { id: 4, nombre: "Biología", codigo: "BIO104", creditos: 3, inscritos: "40/40", paralelos: [{ id: 7, numero: 202 }, { id: 8, numero: 207 }] },
+        { id: 5, nombre: "Historia", codigo: "HIS105", creditos: 4, inscritos: "23/35", paralelos: [{ id: 9, numero: 200 }, { id: 10, numero: 201 }] },
+        { id: 6, nombre: "Programacion", codigo: "PRO115", creditos: 5, inscritos: "29/35", paralelos: [{ id: 11, numero: 200 }, { id: 12, numero: 201 }] },
+        { id: 7, nombre: "Deporte", codigo: "DEP165", creditos: 2, inscritos: "34/35", paralelos: [{ id: 13, numero: 200 }, { id: 14, numero: 201 }] },
     ]);
 
     const [ramosInscritos, setRamosInscritos] = useState([
@@ -23,7 +23,14 @@ const EnrollmentAlumnos = () => {
         { id: 12, nombre: "Programacion", codigo: "PRO119", creditos: 5, inscritos: "38/40", estado: "Inscrita", paralelos: [{ id: 23, numero: 200 }, { id: 24, numero: 201 }] },
     ]);
 
-    const [HorariosRamo, setHorariosRamo] = useState(null);
+    const [verHorariosInscritos, setVerHorariosInscritos] = useState([
+        {codigo: "MAT102", curso_id: 8, paralelo_id: 15, numero: 200, horario: [{ dia: "Martes", bloque: "11-12" }, { dia: "Jueves", bloque: "11-12" }]},
+        {codigo: "FIS103", curso_id: 9, paralelo_id: 17, numero: 201, horario: [{ dia: "Miércoles", bloque: "11-12" }, { dia: "Viernes", bloque: "11-12" }]},
+        {codigo: "QUI104", curso_id: 10, paralelo_id: 20, numero: 201, horario: [{ dia: "Lunes", bloque: "3-4" }, { dia: "Lunes", bloque: "5-6" }]},
+        {codigo: "DEP109", curso_id: 11, paralelo_id: 22, numero: 201, horario: [{ dia: "Viernes", bloque: "1-2" }, { dia: "Viernes", bloque: "3-4" }]},
+        {codigo: "PRO119", curso_id: 12, paralelo_id: 24, numero: 201, horario: [{ dia: "Martes", bloque: "9-10" }, { dia: "Jueves", bloque: "11-12" }]}
+    ])
+    const [verHorariosRamo, setVerHorariosRamo] = useState(null);
 
     const [selectedParallels, setSelectedParallels] = useState([
         {cursoId: 1, paraleloId: 1},
@@ -105,16 +112,16 @@ const EnrollmentAlumnos = () => {
         const horario = Horariosdb.filter((h) => h.curso_id === cursoId && h.paralelo_id === view_parallel[0].paraleloId);
         const ramo = ramos.filter((h) => h.id === cursoId)
 
-        setHorariosRamo({codigo: ramo[0].codigo, ...horario[0]});
+        setVerHorariosRamo({codigo: ramo[0].codigo, ...horario[0]});
     };
 
     return (
         <Box>
-            <Heading color="gray.800" textAlign="center">Inscripción de Ramos</Heading>
+            <Heading color="gray.800" pt={5} textAlign="center">Inscripción de Ramos</Heading>
             <HStack spacing={4} align="start">
                 {/* Sección de ramos */}
                 <Box p={5} bg="white" width="60%">
-                <Heading size="md" color="gray.800" mb={4}>Ramos para Inscribir</Heading>
+                <Heading size="md" color="gray.800" mb={2}>Ramos para Inscribir</Heading>
                     <Stack separator={<StackSeparator />} align="stretch" spacing={4} borderWidth={3} borderRadius="md" p={4} shadow="md" maxHeight="40vh" overflowY="auto">
                         {ramos.map((ramo) => (
                             <Box key={ramo.id}>
@@ -160,17 +167,15 @@ const EnrollmentAlumnos = () => {
 
                 {/* Sección de horario */}
                 <Box p={5} width="40%">
-                <Heading size="md" color="gray.800" mb={4}>Horario</Heading>
-                    {HorariosRamo && (
-                        <Box>
-                            <Horario horario={HorariosRamo} />
-                        </Box>
-                    )}
+                <Heading size="md" color="gray.800" mb={2}>Horario</Heading>
+                    <Box>
+                        <Horario VerHorario={verHorariosRamo} InscritosHorario = {verHorariosInscritos} width={90} height={30}/>
+                    </Box>
                 </Box>
             </HStack>
 
             {/* Sección de ramos inscritos */}
-            <Box mt={8} p={5} bg="white" width="100%">
+            <Box mt={2} p={5} bg="white" width="100%">
                 <Heading size="md" color="gray.800" mb={4}>Ramos Inscritos</Heading>
                 <Stack separator={<StackSeparator />} align="stretch" spacing={4} borderWidth={3} borderRadius="md" p={4} shadow="md" maxHeight="35vh" overflowY="auto">
                     {selectedParallelsInscrito.map((inscrito) => {
