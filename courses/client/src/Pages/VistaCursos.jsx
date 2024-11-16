@@ -1,8 +1,9 @@
-import {React, useState} from "react";
+import { React, useState } from "react";
 import Navbar from "../Components/NavBar";
 import AcorcionCursos from "../Components/Accordion";
 
 export const VistaCursos = () => {
+  const isAdmin = true;
   const [paralelos, setParalelos] = useState([
     {
       curso: "fis120",
@@ -16,7 +17,7 @@ export const VistaCursos = () => {
       paralelo: 201,
       limite_cupo: 80,
       jornada: "Diurna",
-      campus_sede: "San Joaquin"
+      campus_sede: "San Joaquin",
     },
     {
       curso: "inf326",
@@ -68,19 +69,25 @@ export const VistaCursos = () => {
 
   const CrearParalelo = (paralelo) => {
     setParalelos([...paralelos, paralelo]);
-  }
+  };
 
   const CrearCurso = (curso) => {
     setCursos([...cursos, curso]);
-  }
+  };
 
   return (
     <>
       <Navbar />
 
-      <AcorcionCursos cursos={cursos} paralelos={paralelos} crearCurso={CrearCurso} crearParalelo={CrearParalelo}/>
-      
-      
+      <AcorcionCursos
+        cursos={cursos}
+        paralelos={paralelos}
+        crearCurso={CrearCurso}
+        crearParalelo={CrearParalelo}
+
+
+        isAdmin={isAdmin}
+      />
     </>
   );
 };

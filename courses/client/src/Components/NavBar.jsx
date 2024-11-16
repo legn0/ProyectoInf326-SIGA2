@@ -5,7 +5,6 @@ import {
   HStack,
   Link,
   IconButton,
-  Button,
   useDisclosure,
   Stack,
   useColorModeValue,
@@ -33,7 +32,7 @@ export function Navbar() {
           <Image src={Logo} alt="Logo" boxSize="300px" objectFit="contain" />
           <HStack as={"nav"} spacing={4} display={{ base: "none", md: "flex" }}>
             <Link
-              href="#home"
+              href="/home"
               px={2}
               py={1}
               rounded={"md"}
@@ -41,7 +40,7 @@ export function Navbar() {
               Inicio
             </Link>
             <Link
-              href="#Payments"
+              href="/Payments"
               px={2}
               py={1}
               rounded={"md"}
@@ -49,7 +48,7 @@ export function Navbar() {
               Pagos
             </Link>
             <Link
-              href="#Couses"
+              href="/Couses"
               px={2}
               py={1}
               rounded={"md"}
@@ -57,7 +56,7 @@ export function Navbar() {
               Cursos
             </Link>
             <Link
-              href="#Grades"
+              href="/Grades"
               px={2}
               py={1}
               rounded={"md"}
@@ -69,7 +68,7 @@ export function Navbar() {
 
         <Flex alignItems={"center"}>
           <Link
-            href="#Profile"
+            href="/Profile"
             px={2}
             py={1}
             rounded={"md"}
@@ -83,10 +82,10 @@ export function Navbar() {
       {isOpen ? (
         <Box pb={4} display={{ md: "none" }}>
           <Stack as={"nav"} spacing={4}>
-            <Link href="#home">Inicio</Link>
-            <Link href="#Couses">Cursos</Link>
-            <Link href="#Payments">Pagos</Link>
-            <Link href="#Grades">Calificaciones</Link>
+            <Link href="/home">Inicio</Link>
+            <Link href="/Couses">Cursos</Link>
+            <Link href="/Payments">Pagos</Link>
+            <Link href="/Grades">Calificaciones</Link>
           </Stack>
         </Box>
       ) : null}

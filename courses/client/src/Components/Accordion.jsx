@@ -1,6 +1,5 @@
 import {
   Accordion,
-  Stack,
   Table,
   Thead,
   Tr,
@@ -13,7 +12,7 @@ import {
 import AcordionCursosItem from "./AcordionCursosItem";
 import PopUpFormCurso from "../Components/PopUpFormCurso";
 
-function AcorcionCursos({ cursos, paralelos, crearCurso, crearParalelo }) {
+function AcorcionCursos({ cursos, paralelos, crearCurso, crearParalelo, isAdmin }) {
   const disclosureFormCurso = useDisclosure(false);
 
   return (
@@ -27,11 +26,11 @@ function AcorcionCursos({ cursos, paralelos, crearCurso, crearParalelo }) {
                 <Th>Nombre</Th>
                 <Th>Departamento</Th>
                 <Th>Prerequisitos</Th>
-                <Th>
+                {isAdmin ? <Th>
                   <Button onClick={disclosureFormCurso.onOpen}>
                     Crear Curso
                   </Button>
-                </Th>
+                </Th> : ""}
               </Tr>
             </Thead>
             <Tbody>
@@ -41,20 +40,21 @@ function AcorcionCursos({ cursos, paralelos, crearCurso, crearParalelo }) {
                   value={curso.sigla}
                   curso={curso}
                   paralelos={paralelos.filter(
-                    (paralelo) => paralelo.curso == curso.sigla
+                    (paralelo) => paralelo.curso === curso.sigla
                   )}
                   crearParalelo={crearParalelo}
+                  isAdmin={isAdmin}
                 />
               ))}
             </Tbody>
           </Table>
         </TableContainer>
       </Accordion>
-      <PopUpFormCurso
+      {isAdmin ? <PopUpFormCurso
         isOpen={disclosureFormCurso.isOpen}
         onClose={disclosureFormCurso.onClose}
         crearCurso={crearCurso}
-      />
+      /> : ""}
     </>
   );
 }

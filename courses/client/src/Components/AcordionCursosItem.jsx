@@ -5,16 +5,23 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
-  Box,
   Tr,
   Td,
-  Button,
   useDisclosure,
+  IconButton
 } from "@chakra-ui/react";
+import { AddIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import PopUpConsulta from "../Components/PopUpConsulta";
 import PopUpFormParalelo from "../Components/PopUpFormParalelo";
 
-export const AcordionCursosItem = ({ index, value, curso, paralelos, crearParalelo }) => {
+export const AcordionCursosItem = ({
+  index,
+  value,
+  curso,
+  paralelos,
+  crearParalelo,
+  isAdmin
+}) => {
   const disclosureCosulta = useDisclosure(false);
   const disclosureFormParalelo = useDisclosure(false);
 
@@ -35,39 +42,37 @@ export const AcordionCursosItem = ({ index, value, curso, paralelos, crearParale
 
         {paralelos.map((item, index) => {
           return (
-            <>
-              <AccordionPanel pb={4} as={Tr}>
+            <AccordionPanel key={index} pb={3} paddingRight={"-20px"} marginRight={"-450px"}>
+              <Tr>
                 <Td>{item.paralelo}</Td>{" "}
                 <Td>
-                  <Button onClick={disclosureCosulta.onOpen}>
-                    Ver Paralelo
-                  </Button>
+                  <IconButton icon={<InfoOutlineIcon/>} onClick={disclosureCosulta.onOpen}/>
                 </Td>
-              </AccordionPanel>
-              <PopUpConsulta
-                dataParalelo={item}
-                isOpen={disclosureCosulta.isOpen}
-                onClose={disclosureCosulta.onClose}
-              />
-            </>
+                <PopUpConsulta
+                  dataParalelo={item}
+                  isOpen={disclosureCosulta.isOpen}
+                  onClose={disclosureCosulta.onClose}
+                />
+              </Tr>
+            </AccordionPanel>
           );
         })}
 
-        <AccordionPanel as={Tr}>
-          <Td></Td>
+        <AccordionPanel as={Tr} paddingRight={"-20px"} marginRight={"-450px"}>
+          <Td/>
+          <Td/>
           <Td>
-            <Button onClick={disclosureFormParalelo.onOpen}>
-              Crear Paralelo
-            </Button>
+            {isAdmin ? <IconButton icon={<AddIcon/>} size={"md"} onClick={disclosureFormParalelo.onOpen} paddingX={"20px"} marginX={"-20px"} /> : ""}
           </Td>
+        </AccordionPanel>
 
-          <PopUpFormParalelo
+          {isAdmin ? <PopUpFormParalelo
             dataCurso={curso}
             isOpen={disclosureFormParalelo.isOpen}
             onClose={disclosureFormParalelo.onClose}
             crearParalelo={crearParalelo}
-          />
-        </AccordionPanel>
+          /> : ""}
+        
       </AccordionItem>
     </>
   );
