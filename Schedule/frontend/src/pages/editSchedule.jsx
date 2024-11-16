@@ -101,46 +101,50 @@ export const EditSchedule = () => {
         <div className="app">
             <h1 className='Titulo'> SIGA NUEVO  😎</h1>
             <div className='container'>
-                            <div>
-                <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> Id Curso: 
-                <input 
-                    type="text" 
-                    value={courseId} 
-                    onChange={handleCourseIdChange} 
-                    style={{margin: '10px', width: '100px'}}
-                />
-                </h4>
-                <h4> Id Paralelo: 
-                <input 
-                    type="text" 
-                    value={parallelId} 
-                    onChange={handleParallelIdChange} 
-                    style={{margin: '10px', width: '100px'}}
-                />
-                </h4>
-                <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> Nombre Profesor: 
-                <input 
-                    type="text" 
-                    value={professorName} 
-                    onChange={handleProfessorNameChange} 
-                    style={{margin: '10px', width: '100px'}}
-                />
-                </h4>
-                <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> ID Profesor: 
-                <input 
-                    type="text" 
-                    value={professorId} 
-                    onChange={handleProfessorIdChange} 
-                    style={{margin: '10px', width: '100px'}}
-                />
-                </h4>
-                <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> Tipo de Clase: 
-                <select style={{ margin: '10px', maxHeight: '100px', overflowY: 'auto' }} value={classType} onChange={handleClassTypeChange}>
-                    <option value="" disabled>{defaultOptionText}</option>
-                    <option value="Catedra">Catedra</option>
-                    <option value="Ayudantia">Ayudantia</option>
-                </select></h4>
-            </div>
+
+                {/* Formulario de datos */}
+                <div>
+                    <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> Id Curso: 
+                    <input 
+                        type="text" 
+                        value={courseId} 
+                        onChange={handleCourseIdChange} 
+                        style={{margin: '10px', width: '100px'}}
+                    />
+                    </h4>
+                    <h4> Id Paralelo: 
+                    <input 
+                        type="text" 
+                        value={parallelId} 
+                        onChange={handleParallelIdChange} 
+                        style={{margin: '10px', width: '100px'}}
+                    />
+                    </h4>
+                    <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> Nombre Profesor: 
+                    <input 
+                        type="text" 
+                        value={professorName} 
+                        onChange={handleProfessorNameChange} 
+                        style={{margin: '10px', width: '100px'}}
+                    />
+                    </h4>
+                    <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> ID Profesor: 
+                    <input 
+                        type="text" 
+                        value={professorId} 
+                        onChange={handleProfessorIdChange} 
+                        style={{margin: '10px', width: '100px'}}
+                    />
+                    </h4>
+                    <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> Tipo de Clase: 
+                    <select style={{ margin: '10px', maxHeight: '100px', overflowY: 'auto' }} value={classType} onChange={handleClassTypeChange}>
+                        <option value="" disabled>{defaultOptionText}</option>
+                        <option value="Catedra">Catedra</option>
+                        <option value="Ayudantia">Ayudantia</option>
+                    </select></h4>
+                </div>
+
+                {/* Horarios elegidos */}
                 <div className="selected-items">
                     <h2>Horarios elegidos</h2>
                     <ul>
@@ -149,7 +153,8 @@ export const EditSchedule = () => {
                         ))}
                     </ul>
                 </div>
-
+                
+                {/* Tabla de horarios */}
                 <table className="schedule">
                 <thead>
                     <tr>
@@ -174,6 +179,7 @@ export const EditSchedule = () => {
                     </tbody>
                 </table>
             </div>
+            {/* Boton de guardar */}
             <button onClick={handleSubmit} className='button_submit'>Guardar</button>
         </div>
     </>
