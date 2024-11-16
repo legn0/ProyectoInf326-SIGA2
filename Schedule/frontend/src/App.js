@@ -3,12 +3,14 @@ import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-route
 import HorarioTable from "./pages/HorarioTable";
 import './App.css';
 import EditSchedule from "./pages/editSchedule";
-//import CrearCurso from "./pages/CrearCurso";
-//import EliminarCurso from "./pages/EliminarCurso";
+// import CrearCurso from "./pages/CrearCurso";
+// import EliminarCurso from "./pages/EliminarCurso";
 
 function App() {
   const [showModal, setShowModal] = useState(false);
   const [selectedBloqueId, setSelectedBloqueId] = useState(null);
+
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Estado para filtros y datos
   const [filters, setFilters] = useState({ curso: "", paralelo: "", profesor: "" });
@@ -18,29 +20,29 @@ function App() {
       nombre: "Matemáticas",
       paralelo: "A",
       nombre_profesor: "Juan Pérez",
-      bloque_id: 101
+      bloque_id: 101,
     },
     {
       id: 2,
       nombre: "Física",
       paralelo: "B",
       nombre_profesor: "Ana Gómez",
-      bloque_id: 102
+      bloque_id: 102,
     },
     {
       id: 3,
       nombre: "Historia",
       paralelo: "A",
       nombre_profesor: "Carlos López",
-      bloque_id: 103
+      bloque_id: 103,
     },
     {
       id: 4,
       nombre: "Biología",
       paralelo: "C",
       nombre_profesor: "Elena Rodríguez",
-      bloque_id: 104
-    }
+      bloque_id: 104,
+    },
   ]);
   const [filteredCursos, setFilteredCursos] = useState([]);
   const [paralelos, setParalelos] = useState(["A", "B", "C"]);
@@ -49,6 +51,9 @@ function App() {
 
   useEffect(() => {
     setFilteredCursos(cursos);
+
+    const userIsAdmin = true;
+    setIsAdmin(userIsAdmin);
   }, [cursos]);
 
   // Función para manejar cambios en los filtros
@@ -143,18 +148,20 @@ function App() {
           Buscar
         </button>
 
-        {/* Botones adicionales */}
-        <div className="action-buttons">
-          <button onClick={goToEditarPagina} className="action-button">
-            Editar Página
-          </button>
-          <button onClick={goToCrearCurso} className="action-button">
-            Crear Curso
-          </button>
-          <button onClick={goToEliminarCurso} className="action-button">
-            Eliminar Curso
-          </button>
-        </div>
+        {/* Botones adicionales: Mostrar solo si es admin */}
+        {isAdmin && (
+          <div className="action-buttons">
+            <button onClick={goToEditarPagina} className="action-button">
+              Editar Página
+            </button>
+            <button onClick={goToCrearCurso} className="action-button">
+              Crear Curso
+            </button>
+            <button onClick={goToEliminarCurso} className="action-button">
+              Eliminar Curso
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Tabla de cursos */}
@@ -174,7 +181,10 @@ function App() {
               <td>{curso.paralelo}</td>
               <td>{curso.nombre_profesor}</td>
               <td>
-                <button onClick={() => handleOpenHorario(curso.bloque_id)}>
+                <button
+                  className="view-schedule-button"
+                  onClick={() => handleOpenHorario(curso.bloque_id)}
+                >
                   Ver Horario
                 </button>
               </td>
@@ -205,8 +215,8 @@ function MainApp() {
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/editar-pagina" element={<EditSchedule />} />
-        {/*<Route path="/crear-curso" element={<CrearCurso />} />
-        <Route path="/eliminar-curso" element={<EliminarCurso />} />*/}
+        {/* <Route path="/crear-curso" element={<CrearCurso />} />
+        <Route path="/eliminar-curso" element={<EliminarCurso />} /> */}
       </Routes>
     </Router>
   );
