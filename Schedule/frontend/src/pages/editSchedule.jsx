@@ -1,189 +1,240 @@
-import React,{ useState} from 'react'
+import React, { useState } from 'react';
+import {
+  Box,Button,Container,Heading,Input,Select,Table,Tbody,
+  Td,Th,Thead,Tr,UnorderedList,ListItem,useToast,Flex,
+} from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
+import './editSchedule.css';
+
+
 
 export const EditSchedule = () => {
-    const hours = ['1-2','3-4','5-6','7-8','9-10','11-12','13-14','15-16','17-18','19-20'];
-    const days = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
-    const [courseId, setCourseId] = useState('');
-    const [parallelId, setParallelId] = useState('');
-    const [professorId, setProfessorId] = useState('');
-    const [professorName, setProfessorName] = useState('');
-    const [classType, setClassType] = useState('');
-    const [selected, setSelected] = useState({});
-    const [defaultOptionText] = useState('Seleccione una opción');
+  const hours = ['1-2', '3-4', '5-6', '7-8', '9-10', '11-12', '13-14', '15-16', '17-18', '19-20'];
+  const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  const [courseId, setCourseId] = useState('');
+  const [parallelId, setParallelId] = useState('');
+  const [professorId, setProfessorId] = useState('');
+  const [professorName, setProfessorName] = useState('');
+  const [classType, setClassType] = useState('');
+  const [selected, setSelected] = useState({});
+  const [defaultOptionText] = useState('Seleccione una opción');
+  const toast = useToast();
+  const navigate = useNavigate();
 
-    const handleCourseIdChange = (event) => {
-        setCourseId(event.target.value);
-    };
+  const handleBackClick = () => {
+    navigate(-1);
+  };
 
-    const handleParallelIdChange = (event) => {
-        setParallelId(event.target.value);
-    };
-    
-    const handleProfessorIdChange = (event) => {
-        setProfessorId(event.target.value);
-    };
-    const handleProfessorNameChange = (event) => {
-        setProfessorName(event.target.value);
-    };
-    const handleClassTypeChange = (event) => {
-        setClassType(event.target.value);
-    };
-    
-    const handleSelect = (day, hour, rowIndex, colIndex) => {
-        setSelected(prevSelected => ({
-            ...prevSelected,
-            [day]: {
-                ...prevSelected[day],
-                [hour]: prevSelected[day]?.[hour] ? null : { rowIndex, colIndex }
-            }
-        }));
-    };
-    const handleSubmit = async () => {
-        const selectedItems = [];
-        for (const day in selected) {
-          for (const hour in selected[day]) {
-            const selection = selected[day][hour];
-            if (selected[day][hour]) {
-                const id_bloque = selection.colIndex * 10 + selection.rowIndex +1;
-                selectedItems.push({
-                    id_bloque: parseInt(id_bloque, 10),
-                    nombre_bloque: hour, // Assuming courseName is the block name
-                    tipo: classType,
-                    id_profesor: parseInt(professorId,10),
-                    nombre_profesor: professorName, // Replace with actual professor name if available
-                    dia: day
-                });
-            }
-          }
-        }
-        const data = selectedItems;
-        console.log('Data to be sent:', data); // Log the data to verify its structure
-    
-        try {
-          const response = await fetch(`http://127.0.0.1:8000/api/v1/courses/${parseInt(courseId,10)}/parallels/${parseInt(parallelId,10)}/schedules`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
+
+  const handleCourseIdChange = (event) => {
+    setCourseId(event.target.value);
+  };
+
+  const handleParallelIdChange = (event) => {
+    setParallelId(event.target.value);
+  };
+
+  const handleProfessorIdChange = (event) => {
+    setProfessorId(event.target.value);
+  };
+
+  const handleProfessorNameChange = (event) => {
+    setProfessorName(event.target.value);
+  };
+
+  const handleClassTypeChange = (event) => {
+    setClassType(event.target.value);
+  };
+
+  const handleSelect = (day, hour, rowIndex, colIndex) => {
+    setSelected((prevSelected) => ({
+      ...prevSelected,
+      [day]: {
+        ...prevSelected[day],
+        [hour]: prevSelected[day]?.[hour] ? null : { rowIndex, colIndex },
+      },
+    }));
+  };
+
+  const handleSubmit = async () => {
+    const selectedItems = [];
+    for (const day in selected) {
+      for (const hour in selected[day]) {
+        const selection = selected[day][hour];
+        if (selection) {
+          const id_bloque = selection.colIndex * 10 + selection.rowIndex + 1;
+          selectedItems.push({
+            id_bloque: parseInt(id_bloque, 10),
+            nombre_bloque: hour,
+            tipo: classType,
+            id_profesor: parseInt(professorId, 10),
+            nombre_profesor: professorName,
+            dia: day,
           });
-    
-          if (response.ok) {
-            console.log('Data submitted successfully');
-            alert('Datos guardados exitosamente!'); // Show success message
-            window.location.reload(); // Refresh the page
-          } else {
-            console.error('Fallo al enviar datos:', response);
-            alert(`Fallo al enviar datos: ${response}`); // Show error message
-          }
-        } catch (error) {
-            console.error('Error:', error);
-            alert(`Error al conectarse con API: ${error.message}`); // Show error message
-            window.location.reload(); // Refresh the page
-
-
         }
-      };
-
-      const selectedItems = [];
-      for (const day in selected) {
-          for (const hour in selected[day]) {
-              const selection = selected[day][hour];
-              if (selection) {
-                  selectedItems.push(`${day} ${hour} Id Bloque: ${selection.colIndex * 10 + selection.rowIndex +1}`);
-              }
-          }
       }
+    }
+
+    const data = selectedItems;
+    console.log('Data to be sent:', data); // Log the data to verify its structure
+
     
 
-    return (
-    <>
-        <div className="app">
-            <h1 className='Titulo'> SIGA NUEVO  😎</h1>
-            <div className='container'>
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/v1/courses/${courseId}/parallels/${parallelId}/schedules`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
-                {/* Formulario de datos */}
-                <div>
-                    <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> Id Curso: 
-                    <input 
-                        type="text" 
-                        value={courseId} 
-                        onChange={handleCourseIdChange} 
-                        style={{margin: '10px', width: '100px'}}
-                    />
-                    </h4>
-                    <h4> Id Paralelo: 
-                    <input 
-                        type="text" 
-                        value={parallelId} 
-                        onChange={handleParallelIdChange} 
-                        style={{margin: '10px', width: '100px'}}
-                    />
-                    </h4>
-                    <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> Nombre Profesor: 
-                    <input 
-                        type="text" 
-                        value={professorName} 
-                        onChange={handleProfessorNameChange} 
-                        style={{margin: '10px', width: '100px'}}
-                    />
-                    </h4>
-                    <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> ID Profesor: 
-                    <input 
-                        type="text" 
-                        value={professorId} 
-                        onChange={handleProfessorIdChange} 
-                        style={{margin: '10px', width: '100px'}}
-                    />
-                    </h4>
-                    <h4 style={{textAlign:'left', margin: '10px 0px 10px 5px'}}> Tipo de Clase: 
-                    <select style={{ margin: '10px', maxHeight: '100px', overflowY: 'auto' }} value={classType} onChange={handleClassTypeChange}>
-                        <option value="" disabled>{defaultOptionText}</option>
-                        <option value="Catedra">Catedra</option>
-                        <option value="Ayudantia">Ayudantia</option>
-                    </select></h4>
-                </div>
+      if (response.ok) {
+        console.log('Data submitted successfully');
+        toast({
+          title: 'Datos guardados exitosamente!',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
+        window.location.reload(); // Refresh the page
+      } else {
+        console.error('Fallo al enviar datos:', response);
+        toast({
+          title: `Fallo al enviar datos: ${response.statusText}`,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: `Error al conectarse con API: ${error.message}`,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
-                {/* Horarios elegidos */}
-                <div className="selected-items">
-                    <h2>Horarios elegidos</h2>
-                    <ul>
-                        {selectedItems.map((item) => (           
-                            <li key={item}>{item}</li>
+  const selectedItems = [];
+  for (const day in selected) {
+    for (const hour in selected[day]) {
+      const selection = selected[day][hour];
+      if (selection) {
+        const id_bloque = selection.colIndex * 10 + selection.rowIndex + 1;
+        selectedItems.push({
+          id_bloque: parseInt(id_bloque, 10),
+          nombre_bloque: hour,
+          tipo: classType,
+          id_profesor: parseInt(professorId, 10),
+          nombre_profesor: professorName,
+          dia: day,
+        });
+      }
+    }
+  }
+
+  return (
+    <Container maxW="100%" backgroundColor={'white'} fontFamily={'Verdana'}>
+      
+      <Flex justifyContent="space-between" alignItems="center" mb={4}>
+        <Heading as="h3" size="lg"  fontFamily={'Verdana'}>
+          SIGA - Editar Horario
+        </Heading>
+        <Button onClick={handleBackClick} colorScheme="blue" width={150} mt={3}>
+          Volver
+        </Button>
+      </Flex>
+
+
+
+
+        <Flex >
+            <Box mb={4}>
+                <Heading as="h4" size="md" mb={2}>
+                Curso ID:
+                </Heading>
+                <Input value={courseId} onChange={handleCourseIdChange} mb={2} backgroundColor={'#eee'} width={'220px'}/>
+                <Heading as="h4" size="md" mb={2}>
+                Paralelo ID:
+                </Heading>
+                <Input value={parallelId} onChange={handleParallelIdChange} mb={2} backgroundColor={'#eee'} width={'220px'}/>
+                <Heading as="h4" size="md" mb={2}>
+                Profesor ID:
+                </Heading>
+                <Input value={professorId} onChange={handleProfessorIdChange} mb={2} backgroundColor={'#eee'} width={'220px'}/>
+                <Heading as="h4" size="md" mb={2}>
+                Nombre del Profesor:
+                </Heading>
+                <Input value={professorName} onChange={handleProfessorNameChange} mb={2} backgroundColor={'#eee'} width={'220px'} />
+                <Heading as="h4" size="md" mb={2}>
+                Tipo de Clase:
+                </Heading>
+
+                <Select value={classType} onChange={handleClassTypeChange} mb={4} width={'220px'} fontSize={'15px'} backgroundColor={'#eee'}>
+                <option value="" disabled>
+                    {defaultOptionText}
+                </option>
+                <option value="Catedra">Catedra</option>
+                <option value="Ayudantia">Ayudantia</option>
+                </Select>
+
+                <Button onClick={handleSubmit} colorScheme="green" mt={4} mb = {4} width={'100px'}>
+                    Guardar
+                </Button>
+            </Box>
+
+            <Box className="selected-items" mb={4} mr={15} ml={4}>
+                <Heading as="h2" size="md" mb={2}>
+                Horarios elegidos
+                </Heading>
+                <UnorderedList>
+                {selectedItems.map((item) => (
+                    <ListItem key={item.id_bloque}>
+                    {item.dia} {item.nombre_bloque} (ID: {item.id_bloque})
+                    </ListItem>
+                ))}
+                </UnorderedList>
+            </Box>
+            <Box>
+                <Table variant="simple" className="schedule">
+                <Thead>
+                    <Tr>
+                    <Th>Hora</Th>
+                    {days.map((day) => (
+                        <Th key={day}>{day}</Th>
+                    ))}
+                    </Tr>
+                </Thead>
+                <Tbody>
+                    {hours.map((hour, rowIndex) => (
+                    <Tr key={hour}>
+                        <Td>{hour}</Td>
+                        {days.map((day, colIndex) => (
+                        <Td key={day}>
+                            <Button className='button'
+                            variant={selected[day]?.[hour] ? 'solid' : 'outline'}
+                            colorScheme={selected[day]?.[hour] ? 'green' : 'gray'}
+                            onClick={() => handleSelect(day, hour, rowIndex, colIndex)}
+                            display="block">
+                            {selected[day]?.[hour] ? '' : ''}
+                            
+                            </Button>
+                        </Td>
                         ))}
-                    </ul>
-                </div>
-                
-                {/* Tabla de horarios */}
-                <table className="schedule">
-                <thead>
-                    <tr>
-                        <th>Hora</th>
-                        {days.map((day, dayIndex) => (<th key={day}>{day}</th> ))}
-                    </tr>
-                </thead>
-                    <tbody>
-                        {hours.map((hour, rowIndex) => (
-                            <tr key={hour}>
-                                <td>{hour}</td>
-                                {days.map((day, colIndex) => (
-                                    <td key={day}>
-                                        <button
-                                            className={selected[day]?.[hour] ? 'selected' : ''}
-                                            onClick={() => handleSelect(day, hour, rowIndex, colIndex)}>
-                                        </button>
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            {/* Boton de guardar */}
-            <button onClick={handleSubmit} className='button_submit'>Guardar</button>
-        </div>
-    </>
-  )
-}
+                    </Tr>
+                    ))}
+                </Tbody>
+                </Table>
+            </Box>
+        </Flex>
+    </Container>
+  );
+};
 
-export default EditSchedule
+export default EditSchedule;

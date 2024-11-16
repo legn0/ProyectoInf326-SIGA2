@@ -1,144 +1,129 @@
-.app {
-  text-align: center;
-  background-color: #FFF8DE;
-  min-height: 100vh;
-  font-family: "Trebuchet MS", system-ui, -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  
+/* App.css */
+
+/* Estilos para el contenedor de filtros */
+.filter-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
 }
 
-.Titulo {
-  color: #000000;
-  padding: 0;
-  margin: 0 0px 20px 0px;
-  padding: 20px;
-  text-align: left;
-  background-color: rgba(56, 34, 4, 0.349);
-  color: #ffffff;
-
+.dropdown-input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
 }
 
-h4 {
-  color: #000000;
-  padding: 0;
-  margin: 10px 0px 10px 5px;
-  text-align: left;
-  font-family: "Trebuchet MS", system-ui, -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
-
+.search-input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-.container {
-  display:flex;
-  justify-content: center;
-  align-items: flex-start;
-  width: 100%;
-}
-
-
-table.schedule {
-  width: 60%;
-  border-collapse: separate;
-  border: 2px solid #000000;
-  margin: 20px 5px 20px 5px;
-  font-size: 18px;
-  text-align: center;
-  background-color: white;
-  border-radius: 5px;
-
-}
-
-table.schedule th, table.schedule td {
-  background-color: #f2f2f2;
-  border: 1px solid #000000; /* Set the border color for table cells */
-}
-
-button {
-  width: 100%;
-  height: 100%;
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 15px 10px;
-}
-
-button.selected {
-  background-color: #4CAF50; /* Green background for selected buttons */
-  color: white;
-  padding: 18px 13px;
-}
-
-.selected-items {
-  margin-right: 20px;
-
-}
-
-.selected-items h2 {
-  margin: 10px 0 10px 0;
-}
-
-.selected-items ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.selected-items li {
+.search-button {
+  padding: 8px 16px;
   background-color: #4CAF50;
   color: white;
-  padding: 5px;
-  margin: 5px 0;
-  border-radius: 3px;
-}
-
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-
-.button_submit {
-  align-items: center;
-  background-color: #FFFFFF;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: .25rem;
-  box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
-  box-sizing: border-box;
-  color: rgba(0, 0, 0, 0.85);
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  display: inline-flex;
-  font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size: 16px;
-  font-weight: 600;
+  transition: background-color 0.3s;
+  max-width: 80px;
+}
+
+.search-button:hover {
+  background-color: #45a049;
+}
+
+/* Estilos para la tabla principal */
+.main-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.main-table th, .main-table td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+.main-table th {
+  background-color: #f2f2f2;
+}
+
+/* Estilos del modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
   justify-content: center;
-  line-height: 1.25;
-  margin-bottom: 15px;
-  min-height: 3rem;
-  padding: calc(.875rem - 1px) calc(1.5rem - 1px);
-  position: relative;
-  text-decoration: none;
-  transition: all 250ms;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  vertical-align: baseline;
-  width: auto;
 }
 
-.button_submit:hover,
-.button_submit:focus {
-  border-color: rgba(0, 0, 0, 0.15);
-  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
-  color: rgba(0, 0, 0, 0.65);
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-.button_submit:hover {
-  transform: translateY(-1px);
+.close-button {
+  float: right;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-bottom: 10px;
 }
 
-.button_submit:active {
-  background-color: #F0F0F1;
-  border-color: rgba(0, 0, 0, 0.15);
-  box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px;
-  color: rgba(0, 0, 0, 0.65);
-  transform: translateY(0);
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-left: 20px;
+  position: absolute;
+  right: 0;
 }
 
+.action-button {
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.action-button:hover {
+  background-color: #0056b3;
+}
+
+.view-schedule-button {
+  padding: 8px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-schedule-button:hover {
+  background-color: #45a049;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
