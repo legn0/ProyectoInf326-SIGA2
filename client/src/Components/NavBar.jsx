@@ -14,7 +14,7 @@ import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 
 import Logo from "../assets/LOGO.png";
 
-export function Navbar() {
+export function Navbar({isAdmin}) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
@@ -48,12 +48,20 @@ export function Navbar() {
               Pagos
             </Link>
             <Link
-              href="/Couses"
+              href="/Cursos"
               px={2}
               py={1}
               rounded={"md"}
               _hover={{ bg: "gray.200" }}>
               Cursos
+            </Link>
+            <Link
+              href={isAdmin ? "/InscripcionAdmin" : "/InscripcionAlumno"}
+              px={2}
+              py={1}
+              rounded={"md"}
+              _hover={{ bg: "gray.200" }}>
+              Inscripcion
             </Link>
             <Link
               href="/Grades"
@@ -83,7 +91,8 @@ export function Navbar() {
         <Box pb={4} display={{ md: "none" }}>
           <Stack as={"nav"} spacing={4}>
             <Link href="/home">Inicio</Link>
-            <Link href="/Couses">Cursos</Link>
+            <Link href="/Cursos">Cursos</Link>
+            <Link href={isAdmin ? "/InscripcionAdmin" : "/InscripcionAlumno"}>Inscripcion</Link>
             <Link href="/Payments">Pagos</Link>
             <Link href="/Grades">Calificaciones</Link>
           </Stack>

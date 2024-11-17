@@ -77,7 +77,7 @@ export const VistaCursos = () => {
 
   return (
     <>
-      <Navbar />
+      <Navbar isAdmin={isAdmin}/>
 
       <AcorcionCursos
         cursos={cursos}
