@@ -10,6 +10,8 @@ import {
   Heading,
   UnorderedList,
   ListItem,
+  Button,
+  Link,
 } from "@chakra-ui/react";
 
 export const PopUpConsulta = ({ dataParalelo, isOpen, onClose }) => {
@@ -30,7 +32,9 @@ export const PopUpConsulta = ({ dataParalelo, isOpen, onClose }) => {
             <ListItem>Campus/Sede: {dataParalelo.campus_sede}</ListItem>
           </UnorderedList>
         </ModalBody>
-        <ModalFooter></ModalFooter>
+        <ModalFooter>
+          <Link href={`/CrearHorario/${dataParalelo.curso}/${dataParalelo.paralelo}`}>CREAR HORARIO</Link>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );

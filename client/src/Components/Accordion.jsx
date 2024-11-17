@@ -12,7 +12,7 @@ import {
 import AcordionCursosItem from "./AcordionCursosItem";
 import PopUpFormCurso from "../Components/PopUpFormCurso";
 
-function AcorcionCursos({ cursos, paralelos, crearCurso, crearParalelo, isAdmin }) {
+function AcorcionCursos({ cursos, paralelos, crearCurso, crearParalelo, isAdmin, setSelecterParallel, horarioOnOpen}) {
   const disclosureFormCurso = useDisclosure(false);
 
   return (
@@ -44,6 +44,8 @@ function AcorcionCursos({ cursos, paralelos, crearCurso, crearParalelo, isAdmin 
                   )}
                   crearParalelo={crearParalelo}
                   isAdmin={isAdmin}
+                  setSelecterParallel={setSelecterParallel}
+                  horarioOnOpen={horarioOnOpen}
                 />
               ))}
             </Tbody>

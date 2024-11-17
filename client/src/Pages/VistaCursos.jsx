@@ -1,9 +1,19 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import Navbar from "../Components/NavBar";
 import AcorcionCursos from "../Components/Accordion";
+import HorarioTable from "../Components/HorarioTable";
+import { useDisclosure, Button } from "@chakra-ui/icons";
 
 export const VistaCursos = () => {
   const isAdmin = true;
+  const horarioDisclosure = useDisclosure(false);
+  const [selectedBlockId, setSelectedBlockID] = useState();
+  const [horarioFiltrado, setHorarioFiltrado] = useState([]);
+  const [lastHorario, setLastHorario] = useState({
+    last_id: 6,
+    last_bloque_id: 103,
+  });
+
   const [paralelos, setParalelos] = useState([
     {
       curso: "fis120",
@@ -11,6 +21,7 @@ export const VistaCursos = () => {
       limite_cupo: 60,
       jornada: "Diurna",
       campus_sede: "San Joaquin",
+      block_id: 101,
     },
     {
       curso: "fis120",
@@ -18,6 +29,7 @@ export const VistaCursos = () => {
       limite_cupo: 80,
       jornada: "Diurna",
       campus_sede: "San Joaquin",
+      block_id: 102,
     },
     {
       curso: "inf326",
@@ -25,6 +37,7 @@ export const VistaCursos = () => {
       limite_cupo: 70,
       jornada: "Diurna",
       campus_sede: "Casa Central",
+      block_id: 103,
     },
   ]);
 
@@ -67,6 +80,31 @@ export const VistaCursos = () => {
     },
   ]);
 
+  const horarios = [
+    { id: 1, bloque_id: 101, dia: "Lunes", hora: "1-2", ocupado: true },
+    { id: 3, bloque_id: 101, dia: "Martes", hora: "11-12", ocupado: true },
+    { id: 5, bloque_id: 102, dia: "Miércoles", hora: "7-8", ocupado: true },
+    { id: 6, bloque_id: 103, dia: "Jueves", hora: "3-4", ocupado: true },
+    // Más horarios según sea necesario
+  ];
+
+  useEffect(() => {
+    console.log(selectedBlockId);
+    setHorarioFiltrado(horariosFiltrados(selectedBlockId));
+  }, [selectedBlockId]);
+
+  const nextHorario = () => {
+    setLastHorario((prev) => {
+      return {
+        last_id: prev.last_id + 1,
+        last_bloque_id: prev.last_bloque_id + 1,
+      };
+    });
+  };
+
+  const horariosFiltrados = (bloqueId) =>
+    horarios.filter((horario) => horario.bloque_id === bloqueId);
+
   const CrearParalelo = (paralelo) => {
     setParalelos([...paralelos, paralelo]);
   };
@@ -77,16 +115,22 @@ export const VistaCursos = () => {
 
   return (
     <>
-      <Navbar isAdmin={isAdmin}/>
+      <Navbar isAdmin={isAdmin} />
 
       <AcorcionCursos
         cursos={cursos}
         paralelos={paralelos}
         crearCurso={CrearCurso}
         crearParalelo={CrearParalelo}
-
-
         isAdmin={isAdmin}
+        setSelecterParallel={setSelectedBlockID}
+        horarioOnOpen={horarioDisclosure.onOpen}
+      />
+
+      <HorarioTable
+        horarioFiltrado={horarioFiltrado}
+        isOpen={horarioDisclosure.isOpen}
+        onClose={horarioDisclosure.onClose}
       />
     </>
   );

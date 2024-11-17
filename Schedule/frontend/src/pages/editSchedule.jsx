@@ -80,45 +80,45 @@ export const EditSchedule = () => {
 
     
 
-    try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/courses/${courseId}/parallels/${parallelId}/schedules`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        }
-      );
+    // try {
+    //   const response = await fetch(
+    //     `http://127.0.0.1:8000/api/v1/courses/${courseId}/parallels/${parallelId}/schedules`,
+    //     {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify(data),
+    //     }
+    //   );
 
-      if (response.ok) {
-        console.log('Data submitted successfully');
-        toast({
-          title: 'Datos guardados exitosamente!',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        });
-        window.location.reload(); // Refresh the page
-      } else {
-        console.error('Fallo al enviar datos:', response);
-        toast({
-          title: `Fallo al enviar datos: ${response.statusText}`,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      toast({
-        title: `Error al conectarse con API: ${error.message}`,
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-    }
+    //   if (response.ok) {
+    //     console.log('Data submitted successfully');
+    //     toast({
+    //       title: 'Datos guardados exitosamente!',
+    //       status: 'success',
+    //       duration: 5000,
+    //       isClosable: true,
+    //     });
+    //     window.location.reload(); // Refresh the page
+    //   } else {
+    //     console.error('Fallo al enviar datos:', response);
+    //     toast({
+    //       title: `Fallo al enviar datos: ${response.statusText}`,
+    //       status: 'error',
+    //       duration: 5000,
+    //       isClosable: true,
+    //     });
+    //   }
+    // } catch (error) {
+    //   console.error('Error:', error);
+    //   toast({
+    //     title: `Error al conectarse con API: ${error.message}`,
+    //     status: 'error',
+    //     duration: 5000,
+    //     isClosable: true,
+    //   });
+    // }
   };
 
   const selectedItems = [];
@@ -157,11 +157,11 @@ export const EditSchedule = () => {
         <Flex >
             <Box mb={4}>
                 <Heading as="h4" size="md" mb={2}>
-                Curso ID:
+                Curso:
                 </Heading>
                 <Input value={courseId} onChange={handleCourseIdChange} mb={2} backgroundColor={'#eee'} width={'220px'}/>
                 <Heading as="h4" size="md" mb={2}>
-                Paralelo ID:
+                Paralelo:
                 </Heading>
                 <Input value={parallelId} onChange={handleParallelIdChange} mb={2} backgroundColor={'#eee'} width={'220px'}/>
                 <Heading as="h4" size="md" mb={2}>
@@ -196,7 +196,7 @@ export const EditSchedule = () => {
                 <UnorderedList>
                 {selectedItems.map((item) => (
                     <ListItem key={item.id_bloque}>
-                    {item.dia} {item.nombre_bloque} (ID: {item.id_bloque})
+                    {item.dia} {item.nombre_bloque} ({item.hora})
                     </ListItem>
                 ))}
                 </UnorderedList>
