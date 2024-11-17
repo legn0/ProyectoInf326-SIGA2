@@ -132,7 +132,10 @@ def create_or_update_schedule(course_id: int, parallel_id: int, horario: Classes
     """
 
     try:
-        conn = mysql.connector.connect(**db_config)
+        conn = mysql.connector.connect(user=db_config["user"], 
+                                       password=db_config["password"],
+                                       host=db_config["host"],
+                                       database=db_config["database"])
         cursor = conn.cursor(dictionary=True)
 
         # Verificar si existe un horario para ese paralelo y curso
