@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: courses-api-gateway-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: courses-api-gateway-app
+  template:
+    metadata:
+      labels:
+        app: courses-api-gateway-app
+    spec:
+      containers:
+      - name: courses-api-gateway-container
+        image: ttl.sh/courses-api-gateway-img:8h
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 8030
+        envFrom:
+
+        - secretRef:
+            name: courses-api-gateway-secrets
+        resources:
+          requests:
+            memory: 90Mi
+            cpu: 40m
+          limits:
+            memory: 256Mi
+            cpu: 200m

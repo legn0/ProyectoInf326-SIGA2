@@ -38,10 +38,7 @@ def publishCreateCourse(course_name: str, sigla: str, creditos: int, departament
                             body=json.dumps(body)
                             )
     except:
-        time.sleep(2)
-        chan = create_rabbit_connection()
-        publishCreateCourse(course_name, sigla, creditos, departamento, prerequisitos, course_id, chan)
-
+        print("No pude mandar a rabbit")
 def publishUpdatedCourse(channel: BlockingChannel, 
                          course_id: int,
                          name: str = None,
@@ -83,10 +80,7 @@ def publishUpdatedCourse(channel: BlockingChannel,
             body=json.dumps(body)
         )
     except:
-        time.sleep(2)
-        chan = create_rabbit_connection()
-        publishUpdatedCourse(chan, course_id, name, sigla, creditos, departamento, prerequisites)
-    
+        print("no pude mandar actualizacion a rabbit")
 
 def publishDeletedCourse(channel: BlockingChannel,
                            course_id: int):
@@ -109,7 +103,5 @@ def publishDeletedCourse(channel: BlockingChannel,
             body=json.dumps(body)
         )
     except:
-        time.sleep(2)
-        chan = create_rabbit_connection()
-        publishDeletedCourse(chan, course_id)   
+        print("No pude avisat borrado a rabbit")   
   
