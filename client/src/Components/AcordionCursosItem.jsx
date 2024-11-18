@@ -33,9 +33,9 @@ export const AcordionCursosItem = ({
       <AccordionItem key={index} value={value} as={Fragment}>
         <Tr>
           <Td>{curso.sigla}</Td>
-          <Td>{curso.nombre}</Td>
+          <Td>{curso.name}</Td>
           <Td>{curso.departamento}</Td>
-          <Td>{curso.prerequisitos}</Td>
+          <Td>{curso.prerequisites}</Td>
           <Td>
             <AccordionButton>
               <AccordionIcon />

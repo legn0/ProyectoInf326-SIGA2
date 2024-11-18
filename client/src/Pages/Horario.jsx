@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   Text,
@@ -18,7 +18,6 @@ const Horario = ({ VerHorario, InscritosHorario, width=100, height=30 }) => {
     const scheduleMatrix = Array(ScheduleDays.length)
     .fill(null)
     .map(() => Array(ScheduleBlocks.length).fill({Text: "",
-        Text: "",
         bg: "whiteAlpha.300"
     }));
 
@@ -28,7 +27,7 @@ const Horario = ({ VerHorario, InscritosHorario, width=100, height=30 }) => {
             const block = ScheduleBlocks.indexOf(item["bloque"]);
     
             if (day !== -1 && block !== -1) {
-                if(scheduleMatrix[day][block].bg != "whiteAlpha.300"){
+                if(scheduleMatrix[day][block].bg !== "whiteAlpha.300"){
                     scheduleMatrix[day][block] = {
                         Text: "TOPE",
                         bg: "orange.600",
@@ -49,7 +48,7 @@ const Horario = ({ VerHorario, InscritosHorario, width=100, height=30 }) => {
             const block = ScheduleBlocks.indexOf(item["bloque"]);
     
             if (day !== -1 && block !== -1) {
-                if(scheduleMatrix[day][block].bg != "whiteAlpha.300"){
+                if(scheduleMatrix[day][block].bg !== "whiteAlpha.300"){
                     scheduleMatrix[day][block] = {
                         Text: "TOPE",
                         bg: "orange.600",
