@@ -6,11 +6,11 @@ from ..database.db import get_db
 from ..models import coursesModel
 from ..schemas import coursesSchemas 
 
-from ..rabbit.rabbitPublisher import get_rabbit_channel
+# from ..rabbit.rabbitPublisher import get_rabbit_channel
 
-from pika.adapters.blocking_connection import BlockingChannel
+# from pika.adapters.blocking_connection import BlockingChannel
 
-from ..rabbit.courseRabbitFunctions import *
+# from ..rabbit.courseRabbitFunctions import *
 
 router = APIRouter(
     prefix="/api/v1/courses",
@@ -19,7 +19,9 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=list[coursesSchemas.Course])
-def get_courses(db: Session = Depends(get_db), channel: BlockingChannel = Depends(get_rabbit_channel)):
+def get_courses(db: Session = Depends(get_db),
+                #channel: BlockingChannel = Depends(get_rabbit_channel)
+                ):
     """
     Obtiene todos los cursos almacenados en la base de datos.
 
@@ -60,7 +62,9 @@ def get_course(id: int, db: Session = Depends(get_db)):
     return course
 
 @router.post("/", response_model=coursesSchemas.Course) #Crear course
-def create_course(course: coursesSchemas.CourseCreate, db: Session = Depends(get_db), channel: BlockingChannel = Depends(get_rabbit_channel)):
+def create_course(course: coursesSchemas.CourseCreate, db: Session = Depends(get_db),
+                  #channel: BlockingChannel = Depends(get_rabbit_channel)
+                  ):
     """
     Crea un nuevo curso y lo publica en un sistema de mensajería.
 
@@ -80,17 +84,19 @@ def create_course(course: coursesSchemas.CourseCreate, db: Session = Depends(get
     db.add(db_course)
     db.commit()
     db.refresh(db_course)
-    publishCreateCourse(course_id = db_course.id,
-                        course_name=db_course.name,
-                        sigla= db_course.sigla,
-                        creditos=db_course.creditos,
-                        departamento=db_course.departamento,
-                        prerequisitos=db_course.prerequisites,
-                        channel=channel)
+    # publishCreateCourse(course_id = db_course.id,
+    #                     course_name=db_course.name,
+    #                     sigla= db_course.sigla,
+    #                     creditos=db_course.creditos,
+    #                     departamento=db_course.departamento,
+    #                     prerequisitos=db_course.prerequisites,
+    #                     channel=channel)
     return db_course
 
 @router.put("/{id}", response_model=coursesSchemas.Course) #Actualizar course
-def update_course(id: int, course: coursesSchemas.CourseUpdate, db: Session = Depends(get_db), channel: BlockingChannel = Depends(get_rabbit_channel)):
+def update_course(id: int, course: coursesSchemas.CourseUpdate, db: Session = Depends(get_db),
+                  #channel: BlockingChannel = Depends(get_rabbit_channel)
+                  ):
     """
     Actualiza un curso existente.
 
@@ -117,13 +123,15 @@ def update_course(id: int, course: coursesSchemas.CourseUpdate, db: Session = De
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Course not found")
     db_course.update(course.dict(), synchronize_session=False)
     db.commit()
-    publishUpdatedCourse(channel=channel,
-                         course_id=db_course.first().id,
-                         **course.dict(exclude_unset=True))
+    # publishUpdatedCourse(channel=channel,
+    #                      course_id=db_course.first().id,
+    #                      **course.dict(exclude_unset=True))
     return db_course.first()
 
 @router.delete("/{id}", response_model=coursesSchemas.Course) #Eliminar course
-def delete_course(id: int, db: Session = Depends(get_db), channel: BlockingChannel = Depends(get_rabbit_channel)):
+def delete_course(id: int, db: Session = Depends(get_db),
+                  #channel: BlockingChannel = Depends(get_rabbit_channel)
+                  ):
     """
     Elimina un curso existente.
 
@@ -147,7 +155,7 @@ def delete_course(id: int, db: Session = Depends(get_db), channel: BlockingChann
     db_course = db.query(coursesModel.Course).filter(coursesModel.Course.id == id).first()
     if not db_course:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Course not found")
-    publishDeletedCourse(channel=channel,course_id=db_course.id)
+    # publishDeletedCourse(channel=channel,course_id=db_course.id)
     db_course.is_deleted = True
     db.commit()
     db.refresh(db_course)

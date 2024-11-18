@@ -43,10 +43,7 @@ def publishNewParallel(course_id: int, course_name: str, parallel_id: int, paral
                             body=json.dumps(body)
                             )
     except:
-        time.sleep(2)
-        chan = create_rabbit_connection()
-        publishNewParallel(course_id, course_name, parallel_id, parallel_number, limite_cupo, jornada, campus_sede, chan)
-
+        print("No puede avisar creacion de nuevo paralelo")
 def publishUpdatedParallel( channel: BlockingChannel,
                             course_id: int, course_name: str,
                             parallel_id: int, number: int = None,
@@ -86,10 +83,7 @@ def publishUpdatedParallel( channel: BlockingChannel,
             body=json.dumps(body)
         )
     except:
-        time.sleep(2)
-        chan = create_rabbit_connection()
-
-        publishUpdatedParallel(chan, course_id, course_name, parallel_id, number, limite_cupo, jornada, Campus)
+        print("No pude avisar actualizacion de paralelo")
 
 def publishDeletedParallel(channel: BlockingChannel,
                            parallel_id: int, course_id: int, course_name: str):
@@ -118,6 +112,4 @@ def publishDeletedParallel(channel: BlockingChannel,
             body=json.dumps(body)
         )
     except:
-        time.sleep(2)
-        chan = create_rabbit_connection()
-        publishDeletedParallel(chan, parallel_id, course_id, course_name)
+        print("No pude avisar borrado de paralelo")
