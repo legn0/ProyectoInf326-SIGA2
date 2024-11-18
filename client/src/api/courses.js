@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const apiUrlCourses = "http://174.138.124.76/courses/api/v1/courses/";
+
+const legacy = true;
+
+const apiUrlCourses =  `http://${!legacy ? "174.138.124.76" : "174.138.110.82"}/courses/api/v1/courses/` ;
 
 // CURSOS
 export function createCurso({
@@ -31,7 +34,7 @@ export function getCurso({ course_id }) {
 export function getAllCursos() {
   return axios
     .get(`${apiUrlCourses}`, {
-      params: { _sort: "departamento" },
+      params: { _sort: "sigla" },
     })
     .then((res) => res.data);
 }
@@ -45,7 +48,7 @@ export function createParallel({
   jornada,
   campus,
 }) {
-  return axios.post(`${apiUrlCourses}${course_id}/parallels`, {
+  return axios.post(`${apiUrlCourses}${course_id}/parallels/`, {
     number: number,
     limite_cupo: limite_cupo,
     jornada: jornada,
@@ -65,6 +68,8 @@ export function getParallel({ course_id, parallel_id }) {
 
 export function getAllParallelsFromCourse({ course_id }) {
   return axios
-    .get(`${apiUrlCourses}${course_id}/parallels`)
+    .get(`${apiUrlCourses}${course_id}/parallels/`, {
+      params: { _sort: "sigla" },
+    })
     .then((res) => res.data);
 }
