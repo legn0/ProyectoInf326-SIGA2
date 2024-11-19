@@ -10,26 +10,26 @@ import os
 
 router = APIRouter()
 
-RABBIT_USER = os.getenv("RABBIT_USER")
-RABBIT_PASSWORD = os.getenv("RABBIt_PASSWORD")
-RABBIT_NAME = os.getenv("RABBIT_NAME")
+# RABBIT_USER = os.getenv("RABBIT_USER")
+# RABBIT_PASSWORD = os.getenv("RABBIt_PASSWORD")
+# RABBIT_NAME = os.getenv("RABBIT_NAME")
 
-def notify_event(event: str, body: str):
-    """Función para enviar un mensaje a RabbitMQ."""
-    credentials = pika.PlainCredentials(RABBIT_USER, RABBIT_PASSWORD)
-    connection = pika.BlockingConnection(pika.ConnectionParameters(RABBIT_NAME, credentials=credentials))
-    channel = connection.channel()
+# def notify_event(event: str, body: str):
+#     """Función para enviar un mensaje a RabbitMQ."""
+#     credentials = pika.PlainCredentials(RABBIT_USER, RABBIT_PASSWORD)
+#     connection = pika.BlockingConnection(pika.ConnectionParameters(RABBIT_NAME, credentials=credentials))
+#     channel = connection.channel()
     
-    channel.exchange_declare(exchange="enrollment",
-                            exchange_type="topic"
-                             )
+#     channel.exchange_declare(exchange="enrollment",
+#                             exchange_type="topic"
+#                              )
 
-    # Declarar una cola (asegurarse de que existe)
-    channel.queue_declare(queue='enrollment_notifications')
-    # Publicar un mensaje con la clave de enrutamiento basada en el evento
-    channel.basic_publish(exchange='enrollment', routing_key=event, body=body)
-    print(f" [x] Sent {event}: {body}")
-    connection.close()
+#     # Declarar una cola (asegurarse de que existe)
+#     channel.queue_declare(queue='enrollment_notifications')
+#     # Publicar un mensaje con la clave de enrutamiento basada en el evento
+#     channel.basic_publish(exchange='enrollment', routing_key=event, body=body)
+#     print(f" [x] Sent {event}: {body}")
+#     connection.close()
 
 # Consultar una inscripción
 @router.get("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments/{enrollment_id}", response_model=Enrollment, summary="Get Enrollment Details", description="Retrieve the details of a specific enrollment by ID, course, and parallel.")
@@ -82,7 +82,7 @@ def create_enrollment(course_id: int, parallel_id: int, enrollment_request: Enro
     # Crear la inscripción
     enrollment_data = crud.create_enrollment(course_id, parallel_id, enrollment_request)
     # Enviar notificación a RabbitMQ
-    notify_event(f"enrollment.{enrollment_data.id}.created", f"Enrollment {enrollment_data.id} has been created.")
+    # notify_event(f"enrollment.{enrollment_data.id}.created", f"Enrollment {enrollment_data.id} has been created.")
     return enrollment_data
 
 # Actualizar una inscripción existente
@@ -100,7 +100,7 @@ def update_enrollment(course_id: int, parallel_id: int, enrollment_id: int, enro
     enrollment_data = crud.update_enrollment(enrollment_id, enrollment_request)
     if enrollment_data is None:
         raise HTTPException(status_code=404, detail="Inscripción no encontrada")
-    notify_event(f"enrollment.{enrollment_data.id}.updated", f"Enrollment {enrollment_data.id} has been updated.")
+    # notify_event(f"enrollment.{enrollment_data.id}.updated", f"Enrollment {enrollment_data.id} has been updated.")
     return enrollment_data
 
 # Eliminar una inscripción
@@ -117,7 +117,7 @@ def delete_enrollment(course_id: int, parallel_id: int, enrollment_id: int, db: 
     deleted = crud.delete_enrollment(enrollment_id)
     if deleted is None:
         raise HTTPException(status_code=404, detail="Inscripción no encontrada")
-    notify_event(f"enrollment.{enrollment_id}.deleted", f"Enrollment {enrollment_id} has been deleted.")
+    # notify_event(f"enrollment.{enrollment_id.id}.deleted", f"Enrollment {enrollment_id.id} has been deleted.")
     return {"message": "Inscripción eliminada exitosamente", "enrollment": deleted}
 
 #Realizar una ronda de inscripción

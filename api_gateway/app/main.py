@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 import httpx
 import os
 
@@ -32,4 +32,5 @@ async def gateway(service: str, path: str, request: Request):
 
     print(response.status_code)
     print(response.content)
-    return JSONResponse(status_code=response.status_code, content=response.json())
+    
+    return Response(content=response.json(), status_code=response.status_code)
