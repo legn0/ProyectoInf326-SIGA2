@@ -5,7 +5,7 @@ class ExternalCourseAPI:
     @staticmethod
     def get_parallel_data(course_id: int, parallel_id: int):
         try:
-            response = httpx.get(f"http://courses.niciñascerpa.cl/api/v1/courses/{course_id}/parallels/{parallel_id}")
+            response = httpx.get(f"http://174.138.110.82/api/v1/courses/{course_id}/parallels/{parallel_id}")
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as exc:
