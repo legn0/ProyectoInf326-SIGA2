@@ -1,0 +1,98 @@
+.app {
+  text-align: center;
+  background-color: #FFF8DE;
+  min-height: 100vh;
+  
+}
+
+.Titulo {
+  color: #000000;
+  padding: 0;
+  margin: 0 0px 20px 0px;
+  padding: 20px;
+  text-align: left;
+  background-color: rgba(56, 34, 4, 0.349);
+  color: #ffffff;
+
+}
+
+h4 {
+  color: #000000;
+  padding: 0;
+  margin: 10px 0px 10px 5px;
+  text-align: left;
+  font-family: "Trebuchet MS", system-ui, -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+}
+
+.container {
+  display:flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+}
+
+/* Tabla */
+
+table.schedule {
+  border-collapse: separate;
+  border: 2px solid #000000;
+  margin-bottom: 20px;
+  font-size: 18px;
+  text-align: center;
+  background-color: white;
+  border-radius: 5px;
+
+}
+
+table.schedule th, table.schedule td {
+  background-color: #f2f2f2;
+  border: 1px solid #000000; /* Set the border color for table cells */
+  padding: 5px 10px; /* Reduce padding to make cells smaller */
+  margin: 0; /* Ensure no margin is applied */
+}
+
+button {
+  width: 100%;
+  height: 100%; /* Ensure button fills the entire cell */
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+button.selected {
+  background-color: #4CAF50; /* Green background for selected buttons */
+  color: white;
+}
+
+/* Horarios elegidos */
+
+.selected-items {
+  margin-right: 20px;
+
+}
+
+.selected-items h2 {
+  margin: 10px 0 10px 0;
+}
+
+.selected-items ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.selected-items li {
+  background-color: #4CAF50;
+  color: white;
+  padding: 5px;
+  margin: 5px 0;
+  border-radius: 3px;
+}
+
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+

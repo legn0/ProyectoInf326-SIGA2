@@ -70,10 +70,15 @@ def create_enrollment(course_id: int, parallel_id: int, enrollment_request: Enro
     - **enrollment_request**: The enrollment request data
     """
     crud = EnrollmentCRUD(db)
+    # Verificar si existe el curso y paralelo
+    existing_course_parallel = crud.get_course_and_parallel(course_id, parallel_id)
+    if not existing_course_parallel:
+        raise HTTPException(status_code=400, detail="El curso y/o paralelo no existe")
+    # Crear la inscripción
      # Verificar si el estudiante ya está inscrito en el curso y paralelo
     existing_enrollment = crud.get_enrollment_by_student_and_course(enrollment_request.student_id, course_id, parallel_id)
     if existing_enrollment:
-        raise HTTPException(status_code=400, detail="El estudiante ya está inscrito en este curso y paralelo")
+        raise HTTPException(status_code=400, detail="El estudiante ya está inscrito en este curso")
     # Crear la inscripción
     enrollment_data = crud.create_enrollment(course_id, parallel_id, enrollment_request)
     # Enviar notificación a RabbitMQ
@@ -134,12 +139,15 @@ def enroll_students_round(course_id: int, parallel_id: int, db: Session = Depend
         raise HTTPException(status_code=500, detail=str(e))
     # Consultar los estudiantes con estado "Pendiente"
     pending_enrollments = crud.get_pending_enrollments(course_id, parallel_id)
+    active_enrollments = crud.list_enrollments(course_id, parallel_id)
+
+    print(len(active_enrollments))
     
     if not pending_enrollments:
         raise HTTPException(status_code=404, detail="No hay inscripciones pendientes para este curso y paralelo")
 
     # Inscribir hasta el límite de cupos disponibles
-    number_to_enroll = min(cupos, len(pending_enrollments))
+    number_to_enroll = min(cupos-len(active_enrollments), len(pending_enrollments))
     selected_enrollments = random.sample(pending_enrollments, number_to_enroll)
     # Actualizar el estado de las inscripciones seleccionadas a 'Inscrita'
     updated_enrollments = []

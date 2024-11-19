@@ -10,13 +10,13 @@ class Enrollment(BaseModel):
     is_active: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # Cambiado de orm_mode a from_attributes
     
 class EnrollmentCreate(BaseModel):
     student_id: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True  # Cambiado de orm_mode a from_attributes
 
 class EnrollmentUpdate(BaseModel):
     course_id: int 
@@ -24,4 +24,4 @@ class EnrollmentUpdate(BaseModel):
     is_active: str
     
     class Config:
-        orm_mode = True
+        from_attributes = True  # Cambiado de orm_mode a from_attributes

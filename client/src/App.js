@@ -5,6 +5,7 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import VistaCursos from './Pages/VistaCursos'; // Sin llaves, ya que es exportación por defecto
 import EnrollmentAdministrativo from './Pages/EnrollmentAdministrativo';
 import EnrollmentAlumnos from './Pages/EnrollmentAlumnos';
+import EditSchedule from './Pages/editSchedule';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
             <Route path='/Cursos' element={<VistaCursos />} />
             <Route path='/InscripcionAdmin' element={<EnrollmentAdministrativo/>}/>
             <Route path='/InscripcionAlumno' element={<EnrollmentAlumnos/>}/>
+            <Route path="/CrearHorario/:course_id/:parallel_id" element={<EditSchedule/>}/>
           </Routes>
         </div>
       </div>

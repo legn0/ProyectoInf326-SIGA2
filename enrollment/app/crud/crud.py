@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
-from ..models.models import Enrollment_model
-from ..schemas.schemas import Enrollment, EnrollmentCreate, EnrollmentUpdate
+from ..models.models import Enrollment_model, Parallel_data
+from ..schemas.schemas import EnrollmentCreate, EnrollmentUpdate
 
 class EnrollmentCRUD:
     def __init__(self, db: Session):
@@ -34,7 +34,6 @@ class EnrollmentCRUD:
         return self.db.query(Enrollment_model).filter(
             Enrollment_model.student_id == student_id,
             Enrollment_model.course_id == course_id,
-            Enrollment_model.parallel_id == parallel_id,
             or_(
             Enrollment_model.is_active == "Inscrita",
             Enrollment_model.is_active == "Pendiente"
@@ -89,4 +88,66 @@ class EnrollmentCRUD:
             enrollment.is_active = "Eliminada"
             self.db.commit()
             return enrollment
+        return None
+    
+    def get_course_and_parallel(self, course_id: int, parallel_id: int):
+        return (
+            self.db.query(Parallel_data)
+            .filter(
+                Parallel_data.course_id == course_id,
+                Parallel_data.parallel_id == parallel_id,
+                Parallel_data.is_deleted == False
+            )
+            .first()
+        )
+    
+    def create_parallel(self, parallel_id: int, course_id: int):
+        new_parallel = Parallel_data(
+            course_id = course_id,
+            parallel_id = parallel_id,
+            is_deleted = False
+        )
+        self.db.add(new_parallel)
+        self.db.commit()
+        self.db.refresh(new_parallel)
+        return new_parallel
+    
+    def delete_course(self, course_id):
+        enrollments = (
+            self.db.query(Enrollment_model)
+            .filter(Enrollment_model.course_id == course_id)
+        ).all()
+        courses_deleted = (
+            self.db.query(Parallel_data)
+            .filter(Parallel_data.course_id == course_id)
+        ).all()
+        if enrollments:
+            for enrollment in enrollments:
+                enrollment.is_active = "Eliminada"
+                self.db.commit()
+
+        if courses_deleted:
+            for courses in courses_deleted:
+                courses.is_deleted = True
+                self.db.commit()
+        return None
+    
+    def delete_parallel(self, parallel_id):
+        enrollments = (
+            self.db.query(Enrollment_model)
+            .filter(Enrollment_model.parallel_id == parallel_id)
+        ).all()
+        parallel_deleted = (
+            self.db.query(Parallel_data)
+            .filter(Parallel_data.parallel_id == parallel_id)
+        ).all()
+        
+        if enrollments:
+            for enrollment in enrollments:
+                enrollment.is_active = "Eliminada"
+                self.db.commit()
+        if parallel_deleted:
+            for parallel in parallel_deleted:
+                parallel.is_deleted = True
+                self.db.commit()
         return None

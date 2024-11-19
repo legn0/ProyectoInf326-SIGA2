@@ -25,6 +25,7 @@ export const PopUpFormCurso = ({ isOpen, onClose, crearCurso }) => {
     sigla: "",
     nombre: "",
     departamento: "",
+    creditos: 0,
   });
 
   const handleSiglaChange = (event) => {
@@ -35,9 +36,14 @@ export const PopUpFormCurso = ({ isOpen, onClose, crearCurso }) => {
     setNuevoCurso({ ...nuevoCurso, nombre: event.target.value });
   };
 
+  const handleCreditosChange = (event) => {
+    setNuevoCurso({ ...nuevoCurso, creditos: event.target.value });
+  }
+
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
   };
+
 
   const handleDepartamentoChange = (event) => {
     setNuevoCurso({ ...nuevoCurso, departamento: event.target.value });
@@ -87,7 +93,10 @@ export const PopUpFormCurso = ({ isOpen, onClose, crearCurso }) => {
             <FormLabel>Departamento</FormLabel>
             <Input onChange={handleDepartamentoChange} />
           </FormControl>
-
+          <FormControl pt={3} isRequired>
+            <FormLabel>Creditos</FormLabel>
+            <Input onChange={handleCreditosChange} />
+          </FormControl>
           <FormControl>
             <FormLabel>Pre-requisitos:</FormLabel>
             <Input

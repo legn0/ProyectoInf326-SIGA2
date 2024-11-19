@@ -8,7 +8,8 @@ import {
   Tr,
   Td,
   useDisclosure,
-  IconButton
+  IconButton,
+  Button
 } from "@chakra-ui/react";
 import { AddIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import PopUpConsulta from "../Components/PopUpConsulta";
@@ -20,7 +21,9 @@ export const AcordionCursosItem = ({
   curso,
   paralelos,
   crearParalelo,
-  isAdmin
+  isAdmin,
+  setSelecterParallel,
+  horarioOnOpen
 }) => {
   const disclosureCosulta = useDisclosure(false);
   const disclosureFormParalelo = useDisclosure(false);
@@ -30,9 +33,9 @@ export const AcordionCursosItem = ({
       <AccordionItem key={index} value={value} as={Fragment}>
         <Tr>
           <Td>{curso.sigla}</Td>
-          <Td>{curso.nombre}</Td>
+          <Td>{curso.name}</Td>
           <Td>{curso.departamento}</Td>
-          <Td>{curso.prerequisitos}</Td>
+          <Td>{curso.prerequisites}</Td>
           <Td>
             <AccordionButton>
               <AccordionIcon />
@@ -47,6 +50,9 @@ export const AcordionCursosItem = ({
                 <Td>{item.paralelo}</Td>{" "}
                 <Td>
                   <IconButton icon={<InfoOutlineIcon/>} onClick={disclosureCosulta.onOpen}/>
+                </Td>
+                <Td>
+                  <Button onClick={()=>{console.log(item.block_id);setSelecterParallel(item.block_id); horarioOnOpen();}}>Horario</Button>
                 </Td>
                 <PopUpConsulta
                   dataParalelo={item}

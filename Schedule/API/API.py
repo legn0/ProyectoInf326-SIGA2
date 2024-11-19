@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import mysql.connector
 from mysql.connector import Error
@@ -14,7 +15,6 @@ descripcion = """
 API para la gestión de horarios de clases en la universidad USM, parte del modulo cursos.
 
 ## Funciones:
-
 - Crear un nuevo horario para un paralelo específico
 - Actualizar la información de un horario existente
 - Eliminar (soft delete) un horario existente
@@ -27,6 +27,14 @@ app = FastAPI(
     title="API Schedule",
     sumarry="API para la gestión de horarios de clases",
     description=descripcion
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
 )
 
 tags_metadata = [
@@ -132,10 +140,10 @@ def create_or_update_schedule(course_id: int, parallel_id: int, horario: Classes
 
         # Verificar si existe un horario para ese paralelo y curso
         cursor.execute("""
-            SELECT id, bloque_id, tipo 
+            SELECT id, bloque_id, tipo
             FROM horarios 
-            WHERE course_id = %s AND parallel_id = %s AND is_deleted = 0
-        """, (course_id, parallel_id))
+            WHERE course_id = %s AND parallel_id = %s AND is_deleted = 0 AND dia = %s
+        """, (course_id, parallel_id, horario.dia))
         existing_schedule = cursor.fetchone()
 
         bloque_id = None
@@ -171,6 +179,9 @@ def create_or_update_schedule(course_id: int, parallel_id: int, horario: Classes
             if horario.nombre_profesor is not None:
                 update_fields.append("nombre_profesor = %s")
                 update_values.append(horario.nombre_profesor)
+            if horario.dia is not None:
+                update_fields.append("dia = %s")
+                update_values.append(horario.dia)
 
             if not update_fields:
                 raise HTTPException(status_code=400, detail="No se proporcionaron campos para actualizar")
@@ -195,6 +206,7 @@ def create_or_update_schedule(course_id: int, parallel_id: int, horario: Classes
                 "tipo": horario.tipo if horario.tipo is not None else existing_schedule['tipo'],
                 "id_profesor": horario.id_profesor if horario.id_profesor is not None else existing_schedule.get('id_profesor'),
                 "nombre_profesor": horario.nombre_profesor if horario.nombre_profesor is not None else existing_schedule.get('nombre_profesor'),
+                "dia": horario.dia if horario.dia is not None else existing_schedule.get('dia'),
                 "is_deleted": False,
                 "updated_at": datetime.now().isoformat()
             }
@@ -208,10 +220,10 @@ def create_or_update_schedule(course_id: int, parallel_id: int, horario: Classes
                 raise HTTPException(status_code=400, detail="Debe proporcionar bloque y tipo para crear un horario")
 
             insert_query = """
-                INSERT INTO horarios (course_id, parallel_id, bloque_id, tipo, id_profesor, nombre_profesor, is_deleted)
-                VALUES (%s, %s, %s, %s, %s, %s, 0)
+                INSERT INTO horarios (course_id, parallel_id, bloque_id, tipo,dia, id_profesor, nombre_profesor, is_deleted, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, 0, CURRENT_TIMESTAMP)
             """
-            cursor.execute(insert_query, (course_id, parallel_id, bloque_id, horario.tipo, horario.id_profesor, horario.nombre_profesor))
+            cursor.execute(insert_query, (course_id, parallel_id, bloque_id, horario.tipo, horario.dia, horario.id_profesor, horario.nombre_profesor))
             conn.commit()
             new_schedule_id = cursor.lastrowid
 
@@ -225,6 +237,7 @@ def create_or_update_schedule(course_id: int, parallel_id: int, horario: Classes
                 "tipo": horario.tipo,
                 "id_profesor": horario.id_profesor,
                 "nombre_profesor": horario.nombre_profesor,
+                "dia": horario.dia,
                 "is_deleted": False,
                 "created_at": datetime.now().isoformat(),
                 "updated_at": datetime.now().isoformat()
@@ -267,14 +280,14 @@ def update_schedule(course_id: int, parallel_id: int, schedule_id: int, horario:
 
         # Verificar que el horario existe y no está eliminado
         cursor.execute("""
-            SELECT bloque_id, tipo, id_profesor, nombre_profesor FROM horarios
+            SELECT bloque_id, tipo, id_profesor, nombre_profesor, dia FROM horarios
             WHERE id = %s AND course_id = %s AND parallel_id = %s AND is_deleted = 0
         """, (schedule_id, course_id, parallel_id))
         resultado = cursor.fetchone()
         if not resultado:
             raise HTTPException(status_code=404, detail="Horario no encontrado")
 
-        bloque_id_actual, tipo_actual, id_profesor_actual, nombre_profesor_actual = resultado
+        bloque_id_actual, tipo_actual, id_profesor_actual, nombre_profesor_actual, dia_actual = resultado
 
         # Determinar si se actualizará el bloque
         if horario.nombre_bloque:
@@ -299,13 +312,16 @@ def update_schedule(course_id: int, parallel_id: int, schedule_id: int, horario:
         id_profesor = horario.id_profesor if hasattr(horario, 'id_profesor') and horario.id_profesor is not None else id_profesor_actual
         nombre_profesor = horario.nombre_profesor if hasattr(horario, 'nombre_profesor') and horario.nombre_profesor is not None else nombre_profesor_actual
 
+        # Determinar si se actualizará el dia
+        dia = horario.dia if hasattr(horario, 'dia') and horario.dia is not None else dia_actual
+
         # Actualizar el horario en la base de datos
         update_query = """
             UPDATE horarios
-            SET bloque_id = %s, tipo = %s, id_profesor = %s, nombre_profesor = %s, updated_at = CURRENT_TIMESTAMP
+            SET bloque_id = %s, tipo = %s, dia = %s, id_profesor = %s, nombre_profesor = %s, updated_at = CURRENT_TIMESTAMP
             WHERE id = %s
         """
-        cursor.execute(update_query, (bloque_id, tipo, id_profesor, nombre_profesor, schedule_id))
+        cursor.execute(update_query, (bloque_id, tipo, dia, id_profesor, nombre_profesor, schedule_id))
         conn.commit()
 
         # Emisión del evento de actualización
@@ -316,6 +332,7 @@ def update_schedule(course_id: int, parallel_id: int, schedule_id: int, horario:
             "parallel_id": parallel_id,
             "bloque_id": bloque_id,
             "tipo": tipo,
+            "dia": dia,
             "id_profesor": id_profesor,
             "nombre_profesor": nombre_profesor,
             "is_deleted": False,
@@ -423,7 +440,7 @@ def get_info_schedule(course_id: int, parallel_id: int, schedule_id: int):
         # Consultar información del horario junto con el nombre del bloque y las horas en formato string
         cursor.execute("""
             SELECT h.id, h.course_id, h.parallel_id, h.bloque_id, b.nombre AS bloque_nombre, h.id_profesor, h.nombre_profesor,
-                   h.tipo, h.is_deleted, h.created_at, h.updated_at,
+                   h.tipo,h.dia, h.is_deleted, h.created_at, h.updated_at,
                    b.hora_inicio,  -- Aquí se obtiene directamente como string
                    b.hora_fin     -- Aquí también como string
             FROM horarios h
@@ -478,7 +495,7 @@ def get_parallel_schedule(course_id: int, parallel_id: int):
         # Consultar todos los horarios del paralelo que no están eliminados
         cursor.execute("""
             SELECT h.id, h.course_id, h.parallel_id, h.bloque_id, b.nombre AS bloque_nombre, h.id_profesor, h.nombre_profesor,
-                   h.tipo, h.is_deleted, h.created_at, h.updated_at
+                   h.tipo,h.dia, h.is_deleted, h.created_at, h.updated_at
             FROM horarios h
             LEFT JOIN bloques_horario b ON h.bloque_id = b.id
             WHERE h.course_id = %s AND h.parallel_id = %s AND h.is_deleted = 0

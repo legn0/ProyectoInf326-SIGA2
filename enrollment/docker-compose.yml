@@ -1,6 +1,6 @@
 networks:
   rabbitmq:
-    name: rabbitmq
+    external: true
 
 services:
   db:
@@ -10,6 +10,12 @@ services:
       MYSQL_DATABASE: enrollment_db    
       MYSQL_USER: myuser             
       MYSQL_PASSWORD: mypassword     
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 30s
+      retries: 10
+      start_period: 30s
     ports:
       - "3300:3306"
     volumes:
@@ -29,5 +35,11 @@ services:
     networks:
       - rabbitmq
 
+  #rabbit-consumer:
+    #build:
+      #context: .
+      #dockerfile: ./app/rabbit_consume/Dockerfile
+    #networks:
+      #- rabbitmq
 volumes:
   mysql_data:

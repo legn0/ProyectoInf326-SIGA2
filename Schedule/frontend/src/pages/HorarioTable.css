@@ -1,0 +1,43 @@
+/* Estilo general para la tabla */
+.horario-table-container {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .horario-table {
+    width: 80%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .horario-table th,
+  .horario-table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  
+  .horario-table th {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .horario-table td {
+    font-size: 16px;
+  }
+  
+  .horario-table .ocupado {
+    background-color: #FF4C4C;
+    color: white;
+  }
+  
+  .horario-table .vacío {
+    background-color: #A8FF97;
+    color: #333;
+  }
+  
+  .horario-table td:first-child {
+    font-weight: bold;
+  }
+  

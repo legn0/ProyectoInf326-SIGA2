@@ -1,7 +1,7 @@
 
 networks:
   rabbitmq:
-    name: rabbitmq
+    external: true
 
 services:
   db:
