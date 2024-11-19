@@ -19,7 +19,6 @@ function HorarioTable({ isOpen, onClose, horarioFiltrado }) {
   // Definir los días de la semana
   const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 
-  console.log(horarioFiltrado);
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />

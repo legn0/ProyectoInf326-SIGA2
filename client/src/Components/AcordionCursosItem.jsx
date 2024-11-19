@@ -52,7 +52,7 @@ export const AcordionCursosItem = ({
                   <IconButton icon={<InfoOutlineIcon/>} onClick={disclosureCosulta.onOpen}/>
                 </Td>
                 <Td>
-                  <Button onClick={()=>{console.log(item.block_id);setSelecterParallel(item.block_id); horarioOnOpen();}}>Horario</Button>
+                  <Button onClick={()=>{setSelecterParallel(item.block_id); horarioOnOpen();}}>Horario</Button>
                 </Td>
                 <PopUpConsulta
                   dataParalelo={item}

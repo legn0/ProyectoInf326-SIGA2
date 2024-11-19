@@ -27,8 +27,6 @@ export function getSchedule({ course_id, parallel_id, schedule_id }) {
 
 export function getAllSchedulesFromParalelo({ course_id, parallel_id }) {
   return axios
-    .get(`${apiUrlSchedule}${course_id}/parallels/${parallel_id}/schedules/`, {
-      params: { _sort: "bloque_id" },
-    })
+    .get(`${apiUrlSchedule}${course_id}/parallels/${parallel_id}/schedules/`)
     .then((res) => res.data);
 }

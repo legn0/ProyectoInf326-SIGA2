@@ -1,9 +1,10 @@
 import axios from "axios";
 
-
 const legacy = true;
 
-const apiUrlCourses =  `http://${!legacy ? "174.138.124.76" : "174.138.110.82"}/courses/api/v1/courses/` ;
+const apiUrlCourses = `http://${
+  !legacy ? "174.138.124.76/courses" : "174.138.110.82"
+}/api/v1/courses/`;
 
 // CURSOS
 export function createCurso({
@@ -13,7 +14,7 @@ export function createCurso({
   departamento,
   prerequisitos,
 }) {
-  return axios
+  return axios({timeout: 15000})
     .post(apiUrlCourses, {
       name: name,
       sigla: sigla,
@@ -32,11 +33,7 @@ export function getCurso({ course_id }) {
   return axios.delete(`${apiUrlCourses}${course_id}`);
 }
 export function getAllCursos() {
-  return axios
-    .get(`${apiUrlCourses}`, {
-      params: { _sort: "sigla" },
-    })
-    .then((res) => res.data);
+  return axios.get(`${apiUrlCourses}`).then(res=>res.data);
 }
 
 //PARALELOS
@@ -68,8 +65,6 @@ export function getParallel({ course_id, parallel_id }) {
 
 export function getAllParallelsFromCourse({ course_id }) {
   return axios
-    .get(`${apiUrlCourses}${course_id}/parallels/`, {
-      params: { _sort: "sigla" },
-    })
+    .get(`${apiUrlCourses}${course_id}/parallels/`)
     .then((res) => res.data);
 }

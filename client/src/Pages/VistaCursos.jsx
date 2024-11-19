@@ -87,7 +87,6 @@ export const VistaCursos = () => {
   ];
 
   useEffect(() => {
-    console.log(selectedBlockId);
     setHorarioFiltrado(horariosFiltrados(selectedBlockId));
   }, [selectedBlockId]);
 
@@ -121,12 +120,21 @@ export const VistaCursos = () => {
       prerequisites: curso.prerequisitos,
     });
   };
-  return (
-    <>
-      <Navbar isAdmin={isAdmin} />
 
-      <AcorcionCursos
-        cursos={cursosQuery.data ? cursosQuery.data : []}
+
+  useEffect(()=>{
+    console.log(cursosQuery.data)
+  }, [cursosQuery])
+
+
+  const rendering = ()=>{
+      if (cursosQuery.status === "pending"){
+        return <h1>Loading cursos...</h1>  }
+      else if (cursosQuery.status === "error"){
+        return <h1>Error fetching cursos: {cursosQuery.error.message}</h1>
+      } else if (cursosQuery.status ==="success"){
+        return <AcorcionCursos
+        cursos={cursosQuery.data}
         paralelos={paralelos}
         crearCurso={CrearCurso}
         crearParalelo={CrearParalelo}
@@ -134,6 +142,16 @@ export const VistaCursos = () => {
         setSelecterParallel={setSelectedBlockID}
         horarioOnOpen={horarioDisclosure.onOpen}
       />
+      }
+  }
+
+  return (
+    <>
+      <Navbar isAdmin={isAdmin} />
+
+
+      {rendering()}
+      
 
       <HorarioTable
         horarioFiltrado={horarioFiltrado}
