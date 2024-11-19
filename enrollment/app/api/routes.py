@@ -59,6 +59,17 @@ def list_enrollments(course_id: int, parallel_id: int, db: Session = Depends(get
     crud = EnrollmentCRUD(db)
     return crud.list_enrollments(course_id, parallel_id)
 
+#Listar todas las inscripciones de un estudiante
+@router.get("/api/v1/student/{student_id}", response_model=list[Enrollment], summary="List All Enrollments", description="Retrieve all enrollments for a specific student.")
+def list_enrollments(student_id: int, db: Session = Depends(get_db)):
+    """
+    Get a list of all enrollments for a specific parallel.
+
+    - **student_id**: ID of the student
+    """
+    crud = EnrollmentCRUD(db)
+    return crud.get_enrollments_by_student(student_id)
+
 # Crear una nueva inscripción
 @router.post("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments", response_model=Enrollment, summary="Create a New Enrollment", description="Create a new enrollment for a course and parallel. The student must not be already enrolled.")
 def create_enrollment(course_id: int, parallel_id: int, enrollment_request: EnrollmentCreate, db: Session = Depends(get_db)):

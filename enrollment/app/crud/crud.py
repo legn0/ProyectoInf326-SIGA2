@@ -40,6 +40,15 @@ class EnrollmentCRUD:
             )
         ).first()
     
+    def get_enrollments_by_student(self, student_id: int):
+        return self.db.query(Enrollment_model).filter(
+            Enrollment_model.student_id == student_id,
+            or_(
+            Enrollment_model.is_active == "Inscrita",
+            Enrollment_model.is_active == "Pendiente"
+            )
+        ).all()
+    
     def get_pending_enrollments(self, course_id: int, parallel_id: int):
         return (
             self.db.query(Enrollment_model)
