@@ -15,9 +15,16 @@ import {
   ModalBody,
 } from "@chakra-ui/react";
 
-function HorarioTable({ isOpen, onClose, horarioFiltrado }) {
+import { useQuery } from "@tanstack/react-query";
+import { getAllSchedulesFromParalelo } from "../api/schedule";
+function HorarioTable({ isOpen, onClose, paralelo, curso }) {
   // Definir los días de la semana
   const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+
+  const horarioQuery = useQuery({
+    queryKey: ["schedule", curso, paralelo],
+    queryFn: getAllSchedulesFromParalelo(curso, paralelo) 
+  })
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -58,8 +65,8 @@ function HorarioTable({ isOpen, onClose, horarioFiltrado }) {
                     <Td>{hora}</Td>
                     {diasSemana.map((dia) => {
                       // Buscar el horario correspondiente para cada día y hora
-                      const horario = horarioFiltrado.find(
-                        (h) => h.dia === dia && h.hora === hora
+                      const horario = (horarioQuery.data ? horarioQuery.data : []).find(
+                        (h) => h.dia === dia && h.bloque_nombre === hora
                       );
 
                       return (

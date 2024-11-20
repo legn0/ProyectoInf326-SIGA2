@@ -14,15 +14,15 @@ export function createCurso({
   departamento,
   prerequisitos,
 }) {
-  return axios({timeout: 15000})
+  return axios()
     .post(apiUrlCourses, {
       name: name,
       sigla: sigla,
       creditos: creditos,
       departamento: departamento,
       prerequisites: prerequisitos,
-    })
-    .then((res) => res.data);
+    }).then(res=> res.data)
+
 }
 
 export function eliminarCurso({ course_id }) {

@@ -7,9 +7,9 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { createCurso, getAllCursos } from "../api/courses";
 
 export const VistaCursos = () => {
-  const isAdmin = false;
+  const isAdmin = true;
   const horarioDisclosure = useDisclosure(false);
-  const [selectedBlockId, setSelectedBlockID] = useState();
+  const [selectedBlockId, setSelectedBlockID] = useState({ id: 0, curso: 0 });
   const [horarioFiltrado, setHorarioFiltrado] = useState([]);
 
   const [paralelos, setParalelos] = useState([
@@ -86,12 +86,12 @@ export const VistaCursos = () => {
     // Más horarios según sea necesario
   ];
 
-  useEffect(() => {
-    setHorarioFiltrado(horariosFiltrados(selectedBlockId));
-  }, [selectedBlockId]);
+  // useEffect(() => {
+  //   setHorarioFiltrado(horariosFiltrados(selectedBlockId));
+  // }, [selectedBlockId]);
 
-  const horariosFiltrados = (bloqueId) =>
-    horarios.filter((horario) => horario.bloque_id === bloqueId);
+  // const horariosFiltrados = (bloqueId) =>
+  //   horarios.filter((horario) => horario.bloque_id === bloqueId);
 
   const CrearParalelo = (paralelo) => {
     setParalelos([...paralelos, paralelo]);
@@ -112,49 +112,49 @@ export const VistaCursos = () => {
   });
 
   const CrearCurso = (curso) => {
-    createCursoMutation.mutate({
-      name: curso.nombre,
-      sigla: curso.sigla,
-      creditos: curso.creditos,
-      departamento: curso.departamennto,
-      prerequisites: curso.prerequisitos,
-    });
+    console.log("creando")
+    createCursoMutation.mutate(
+      curso.nombre,
+      curso.sigla,
+      curso.creditos,
+      curso.departamennto,
+      curso.prerequisitos
+    );
   };
 
+  useEffect(() => {
+    console.log(cursosQuery.data);
+  }, [cursosQuery]);
 
-  useEffect(()=>{
-    console.log(cursosQuery.data)
-  }, [cursosQuery])
-
-
-  const rendering = ()=>{
-      if (cursosQuery.status === "pending"){
-        return <h1>Loading cursos...</h1>  }
-      else if (cursosQuery.status === "error"){
-        return <h1>Error fetching cursos: {cursosQuery.error.message}</h1>
-      } else if (cursosQuery.status ==="success"){
-        return <AcorcionCursos
-        cursos={cursosQuery.data}
-        paralelos={paralelos}
-        crearCurso={CrearCurso}
-        crearParalelo={CrearParalelo}
-        isAdmin={isAdmin}
-        setSelecterParallel={setSelectedBlockID}
-        horarioOnOpen={horarioDisclosure.onOpen}
-      />
-      }
-  }
+  const rendering = () => {
+    if (cursosQuery.status === "pending") {
+      return <h1>Loading cursos...</h1>;
+    } else if (cursosQuery.status === "error") {
+      return <h1>Error fetching cursos: {cursosQuery.error.message}</h1>;
+    } else if (cursosQuery.status === "success") {
+      return (
+        <AcorcionCursos
+          cursos={cursosQuery.data}
+          paralelos={paralelos}
+          crearCurso={CrearCurso}
+          crearParalelo={CrearParalelo}
+          isAdmin={isAdmin}
+          setSelecterParallel={setSelectedBlockID}
+          horarioOnOpen={horarioDisclosure.onOpen}
+        />
+      );
+    }
+  };
 
   return (
     <>
       <Navbar isAdmin={isAdmin} />
 
-
       {rendering()}
-      
 
       <HorarioTable
-        horarioFiltrado={horarioFiltrado}
+        paralelo={selectedBlockId.id}
+        curso={selectedBlockId.curso}
         isOpen={horarioDisclosure.isOpen}
         onClose={horarioDisclosure.onClose}
       />

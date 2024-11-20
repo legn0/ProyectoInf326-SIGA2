@@ -18,6 +18,8 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { createSchedule } from "../api/schedule";
 // import './editSchedule.css';
 
 export const EditSchedule = () => {
@@ -44,10 +46,14 @@ export const EditSchedule = () => {
     "Domingo",
   ];
 
-  const [classType, setClassType] = useState("");
+
+
+  const [classType, setClassType] = useState('');
   const [selected, setSelected] = useState({});
-  const [defaultOptionText] = useState("Seleccione una opción");
+  const [defaultOptionText] = useState('Seleccione una opción');
   const navigate = useNavigate();
+
+
 
   const handleBackClick = () => {
     navigate(-1);
@@ -68,6 +74,14 @@ export const EditSchedule = () => {
     }));
   };
 
+  const createScheduleMutation = useMutation({
+    mutationFn: (selectedItems) => {
+      selectedItems.map((item) => createSchedule(course_id, parallel_id, item))
+    },
+    onError: (data) => console.log("No pude mandar el horario")
+
+  })
+
   const handleSubmit = () => {
     const selectedItems = [];
     for (const day in selected) {
@@ -76,8 +90,8 @@ export const EditSchedule = () => {
         if (selection) {
           const id_bloque = selection.colIndex * 10 + selection.rowIndex + 1;
           selectedItems.push({
-            // id_bloque: parseInt(id_bloque, 10),
-            hora: hour,
+            id_bloque: parseInt(id_bloque, 10),
+            nombre_bloque: hour,
             tipo: classType,
             dia: day,
           });
@@ -87,6 +101,9 @@ export const EditSchedule = () => {
 
     const data = selectedItems;
     console.log("Data to be sent:", data); // Log the data to verify its structure
+    
+    createScheduleMutation.mutate(data);
+  
   };
 
   const selectedItems = [];
@@ -118,7 +135,7 @@ export const EditSchedule = () => {
 
       <Flex>
         <Box mb={4}>
-          <Heading as="h4" size="md" mb={2}>
+          <Heading as="h4" size="md" mb={2} onChan>
             Curso ID : {course_id}
           </Heading>
           <Heading as="h4" size="md" mb={2}>
