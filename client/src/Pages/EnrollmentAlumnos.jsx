@@ -14,89 +14,97 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { getAllCursos, getAllParallelsFromCourse } from "../api/courses";
 
 import Horario from "./Horario";
-import { getInscripcionEstudiante } from "../api/enrollment";
+import {
+  getAllInscripcionesFromParalelo,
+  getInscripcionEstudiante,
+  inscribirEstudiante,
+  eliminarInscripcion,
+} from "../api/enrollment";
+import { getAllSchedulesFromParalelo } from "../api/schedule";
 
 export const EnrollmentAlumnos = () => {
   // Datos ficticios de los ramos
-  const [ramos, setRamos] = useState([
-    {
-      id: 1,
-      nombre: "Matemáticas",
-      codigo: "MAT101",
-      creditos: 5,
-      inscritos: "12/30",
-      paralelos: [
-        { id: 1, numero: 200 },
-        { id: 2, numero: 201 },
-      ],
-    },
-    {
-      id: 2,
-      nombre: "Física",
-      codigo: "FIS102",
-      creditos: 4,
-      inscritos: "29/30",
-      paralelos: [
-        { id: 3, numero: 201 },
-        { id: 4, numero: 204 },
-      ],
-    },
-    {
-      id: 3,
-      nombre: "Química",
-      codigo: "QUI103",
-      creditos: 6,
-      inscritos: "15/15",
-      paralelos: [
-        { id: 5, numero: 200 },
-        { id: 6, numero: 201 },
-      ],
-    },
-    {
-      id: 4,
-      nombre: "Biología",
-      codigo: "BIO104",
-      creditos: 3,
-      inscritos: "40/40",
-      paralelos: [
-        { id: 7, numero: 202 },
-        { id: 8, numero: 207 },
-      ],
-    },
-    {
-      id: 5,
-      nombre: "Historia",
-      codigo: "HIS105",
-      creditos: 4,
-      inscritos: "23/35",
-      paralelos: [
-        { id: 9, numero: 200 },
-        { id: 10, numero: 201 },
-      ],
-    },
-    {
-      id: 6,
-      nombre: "Programacion",
-      codigo: "PRO115",
-      creditos: 5,
-      inscritos: "29/35",
-      paralelos: [
-        { id: 11, numero: 200 },
-        { id: 12, numero: 201 },
-      ],
-    },
-    {
-      id: 7,
-      nombre: "Deporte",
-      codigo: "DEP165",
-      creditos: 2,
-      inscritos: "34/35",
-      paralelos: [
-        { id: 13, numero: 200 },
-        { id: 14, numero: 201 },
-      ],
-    },
-  ]);
+  // const [ramos, setRamos] = useState([
+  //   {
+  //     id: 1,
+  //     nombre: "Matemáticas",
+  //     codigo: "MAT101",
+  //     creditos: 5,
+  //     inscritos: "12/30",
+  //     paralelos: [
+  //       { id: 1, numero: 200 },
+  //       { id: 2, numero: 201 },
+  //     ],
+  //   },
+  //   {
+  //     id: 2,
+  //     nombre: "Física",
+  //     codigo: "FIS102",
+  //     creditos: 4,
+  //     inscritos: "29/30",
+  //     paralelos: [
+  //       { id: 3, numero: 201 },
+  //       { id: 4, numero: 204 },
+  //     ],
+  //   },
+  //   {
+  //     id: 3,
+  //     nombre: "Química",
+  //     codigo: "QUI103",
+  //     creditos: 6,
+  //     inscritos: "15/15",
+  //     paralelos: [
+  //       { id: 5, numero: 200 },
+  //       { id: 6, numero: 201 },
+  //     ],
+  //   },
+  //   {
+  //     id: 4,
+  //     nombre: "Biología",
+  //     codigo: "BIO104",
+  //     creditos: 3,
+  //     inscritos: "40/40",
+  //     paralelos: [
+  //       { id: 7, numero: 202 },
+  //       { id: 8, numero: 207 },
+  //     ],
+  //   },
+  //   {
+  //     id: 5,
+  //     nombre: "Historia",
+  //     codigo: "HIS105",
+  //     creditos: 4,
+  //     inscritos: "23/35",
+  //     paralelos: [
+  //       { id: 9, numero: 200 },
+  //       { id: 10, numero: 201 },
+  //     ],
+  //   },
+  //   {
+  //     id: 6,
+  //     nombre: "Programacion",
+  //     codigo: "PRO115",
+  //     creditos: 5,
+  //     inscritos: "29/35",
+  //     paralelos: [
+  //       { id: 11, numero: 200 },
+  //       { id: 12, numero: 201 },
+  //     ],
+  //   },
+  //   {
+  //     id: 7,
+  //     nombre: "Deporte",
+  //     codigo: "DEP165",
+  //     creditos: 2,
+  //     inscritos: "34/35",
+  //     paralelos: [
+  //       { id: 13, numero: 200 },
+  //       { id: 14, numero: 201 },
+  //     ],
+  //   },
+  // ]);
+
+  const [selectedParallels, setSelectedParallels] = useState([]);
 
   //STUDENT_ID sacado de la sesion
   const [student_id, setStudent_id] = useState(10);
@@ -121,8 +129,14 @@ export const EnrollmentAlumnos = () => {
           );
 
           const isActive = los_cursos[0]?.is_active;
+          const inscripcion_id = los_cursos[0]?.id;
 
-          return { ...curso, paralelos: paralelosFiltrados, estado: isActive };
+          return {
+            ...curso,
+            paralelos: paralelosFiltrados,
+            estado: isActive,
+            id_inscripcion: inscripcion_id,
+          };
         });
       return cursos_inscritos;
     },
@@ -136,9 +150,15 @@ export const EnrollmentAlumnos = () => {
   const paralelosQuery = useQuery({
     queryKey: ["prallels"],
     queryFn: () => {
-      cursosQuery.data.map((value, index) => {
+      return cursosQuery.data.map((value, index) => {
         let cursos_formateados = [];
         let paralelos = getAllParallelsFromCourse(value.id);
+
+        setSelectedParallels([
+          ...selectedParallels,
+          { cursoId: value.id, paraleloId: paralelos[0]?.id },
+        ]);
+
         cursos_formateados = [
           ...cursos_formateados,
           {
@@ -155,68 +175,78 @@ export const EnrollmentAlumnos = () => {
     },
   });
 
-  const [ramosInscritos, setRamosInscritos] = useState([
-    {
-      id: 8,
-      nombre: "Matemáticas",
-      codigo: "MAT102",
-      creditos: 5,
-      inscritos: "12/30",
-      estado: "Pendiente",
-      paralelos: [
-        { id: 15, numero: 200 },
-        { id: 16, numero: 201 },
-      ],
-    },
-    {
-      id: 9,
-      nombre: "Física",
-      codigo: "FIS103",
-      creditos: 4,
-      inscritos: "29/30",
-      estado: "Inscrita",
-      paralelos: [
-        { id: 17, numero: 201 },
-        { id: 18, numero: 204 },
-      ],
-    },
-    {
-      id: 10,
-      nombre: "Química",
-      codigo: "QUI104",
-      creditos: 6,
-      inscritos: "15/15",
-      estado: "Pendiente",
-      paralelos: [
-        { id: 19, numero: 200 },
-        { id: 20, numero: 201 },
-      ],
-    },
-    {
-      id: 11,
-      nombre: "Deporte",
-      codigo: "DEP109",
-      creditos: 2,
-      inscritos: "15/15",
-      estado: "Pendiente",
-      paralelos: [
-        { id: 21, numero: 200 },
-        { id: 22, numero: 201 },
-      ],
-    },
-    {
-      id: 12,
-      nombre: "Programacion",
-      codigo: "PRO119",
-      creditos: 5,
-      inscritos: "38/40",
-      estado: "Inscrita",
-      paralelos: [
-        { id: 23, numero: 200 },
-        { id: 24, numero: 201 },
-      ],
-    },
-  ]);
+  const inscribirEstudianteMutation = useMutation({
+    mutationFn: inscribirEstudiante,
+    onError: (data) => console.log("Error en la inscripcion"),
+  });
+
+  const eliminarInscripcionMutation = useMutation({
+    mutationFn: eliminarInscripcion,
+    onError: (data) => console.log("Error en la eliminación de la inscripcion"),
+  });
+
+  // const [ramosInscritos, setRamosInscritos] = useState([
+  //   {
+  //     id: 8,
+  //     nombre: "Matemáticas",
+  //     codigo: "MAT102",
+  //     creditos: 5,
+  //     estado: "Inscrita",
+  //     paralelos: [
+  //       { id: 15, numero: 200 },
+  //       { id: 16, numero: 201 },
+  //     ],
+  //      id_inscripcion: 20
+  //   },
+  //   {
+  //     id: 9,
+  //     nombre: "Física",
+  //     codigo: "FIS103",
+  //     creditos: 4,
+  //     inscritos: "29/30",
+  //     estado: "Inscrita",
+  //     paralelos: [
+  //       { id: 17, numero: 201 },
+  //       { id: 18, numero: 204 },
+  //     ],
+  //   },
+  //   {
+  //     id: 10,
+  //     nombre: "Química",
+  //     codigo: "QUI104",
+  //     creditos: 6,
+  //     inscritos: "15/15",
+  //     estado: "Pendiente",
+  //     paralelos: [
+  //       { id: 19, numero: 200 },
+  //       { id: 20, numero: 201 },
+  //     ],
+  //   },
+  //   {
+  //     id: 11,
+  //     nombre: "Deporte",
+  //     codigo: "DEP109",
+  //     creditos: 2,
+  //     inscritos: "15/15",
+  //     estado: "Pendiente",
+  //     paralelos: [
+  //       { id: 21, numero: 200 },
+  //       { id: 22, numero: 201 },
+  //     ],
+  //   },
+  //   {
+  //     id: 12,
+  //     nombre: "Programacion",
+  //     codigo: "PRO119",
+  //     creditos: 5,
+  //     inscritos: "38/40",
+  //     estado: "Inscrita",
+  //     paralelos: [
+  //       { id: 23, numero: 200 },
+  //       { id: 24, numero: 201 },
+  //     ],
+  //   },
+  // ]);
 
   const [verHorariosInscritos, setVerHorariosInscritos] = useState([
     {
@@ -272,23 +302,41 @@ export const EnrollmentAlumnos = () => {
   ]);
   const [verHorariosRamo, setVerHorariosRamo] = useState(null);
 
-  const [selectedParallels, setSelectedParallels] = useState([
-    { cursoId: 1, paraleloId: 1 },
-    { cursoId: 2, paraleloId: 3 },
-    { cursoId: 3, paraleloId: 5 },
-    { cursoId: 4, paraleloId: 7 },
-    { cursoId: 5, paraleloId: 9 },
-    { cursoId: 6, paraleloId: 11 },
-    { cursoId: 7, paraleloId: 13 },
-  ]);
+  const horariosQuery = useQuery({
+    queryKey: ["horarios", selectedParallels],
+    queryFn: () => {
+      let horariosFinales = [];
 
-  const [selectedParallelsInscrito, setSelectedParallelsInscrito] = useState([
-    { cursoId: 8, paraleloId: 15 },
-    { cursoId: 9, paraleloId: 17 },
-    { cursoId: 10, paraleloId: 19 },
-    { cursoId: 11, paraleloId: 21 },
-    { cursoId: 12, paraleloId: 23 },
-  ]);
+      selectedParallels.forEach((value) => {
+        let horarios = getAllSchedulesFromParalelo(
+          value.cursoId,
+          value.paraleloId
+        );
+        let horarios_formateados = horarios.reduce((acc, curr) => {
+          let paralelo = acc.find(
+            (item) =>
+              item.curso_id === curr.course_id &&
+              item.paralelo_id === curr.paralell_id
+          );
+          if (paralelo) {
+            paralelo.horario.push({
+              dia: curr.dia,
+              bloque: curr.bloque_nombre,
+            });
+          } else {
+            acc.push({
+              curso_id: curr.course_id,
+              paralelo_id: curr.parallel_id,
+              horario: [{ dia: curr.dia, bloque: curr.bloque_nombre }],
+            });
+          }
+          return acc;
+        }, []);
+
+        horariosFinales.push(...horarios_formateados);
+      });
+    },
+  });
 
   const [Horariosdb, setHorariosdb] = useState([
     {
@@ -519,40 +567,38 @@ export const EnrollmentAlumnos = () => {
     );
   };
 
-  const handleSelectParallelInscrito = (cursoId, newParaleloId) => {
-    setSelectedParallelsInscrito((prev) =>
-      prev.map((item) =>
-        item.cursoId === cursoId ? { ...item, paraleloId: newParaleloId } : item
-      )
-    );
+  // const handleSelectParallelInscrito = (cursoId, newParaleloId) => {
+  //   setSelectedParallelsInscrito((prev) =>
+  //     prev.map((item) =>
+  //       item.cursoId === cursoId ? { ...item, paraleloId: newParaleloId } : item
+  //     )
+  //   );
+  // };
+
+  const handleEliminar = (id_curso, id_paralelo, id_inscripcion) => {
+    eliminarInscripcionMutation.mutate({
+      course_id: id_curso,
+      parallel_id: id_paralelo,
+      enrollment_id: id_inscripcion,
+    });
   };
 
-  const handleEliminar = (cursoId) => {
-    setSelectedParallelsInscrito((prev) =>
-      prev.filter((item) => item.cursoId !== cursoId)
-    );
-  };
-
-  const handleInscribir = (ramoId) => {
-    setRamos((prevRamos) =>
-      prevRamos.map((ramo) =>
-        ramo.id === ramoId
-          ? {
-              ...ramo,
-              inscritos: parseInt(ramo.inscritos.split("/")[0]) + 1 + "/30",
-            } // Ejemplo de actualización de inscritos
-          : ramo
-      )
-    );
+  const handleInscribir = (ramoId, paraleloId) => {
+    inscribirEstudianteMutation.mutate({
+      course_id: ramoId,
+      paralell_id: paraleloId,
+      estudiante: JSON.stringify({ student_id: student_id }),
+    });
   };
 
   const handleHorario = (cursoId) => {
+    //esperando a schedule
     const view_parallel = selectedParallels.filter(
       (h) => h.cursoId === cursoId
     );
-    const horario = Horariosdb.filter(
+    const horario = horariosQuery.data.filter(
       (h) =>
-        h.curso_id === cursoId && h.paralelo_id === view_parallel[0].paraleloId
+        h.curso_id == cursoId && h.paralelo_id == view_parallel[0].paraleloId
     );
     const ramo = paralelosQuery.data.filter((h) => h.id === cursoId);
 
@@ -672,10 +718,7 @@ export const EnrollmentAlumnos = () => {
           shadow="md"
           maxHeight="35vh"
           overflowY="auto">
-          {selectedParallelsInscrito.map((inscrito) => {
-            const ramo = inscripcionesEstudianteQuery.data.find(
-              (ramo) => ramo.id === inscrito.cursoId
-            );
+          {inscripcionesEstudianteQuery.data.map((inscrito) => {
             return (
               <Box key={inscrito.cursoId}>
                 <HStack spacing={4} justify="space-between" align="center">
@@ -684,34 +727,28 @@ export const EnrollmentAlumnos = () => {
                     fontSize="md"
                     fontWeight="bold"
                     color="gray.800">
-                    {ramo.codigo}
+                    {inscrito.codigo}
                   </Text>
                   <Text flex={1} fontSize="md" color="gray.700">
-                    Créditos: {ramo.creditos}
+                    Créditos: {inscrito.creditos}
                   </Text>
                   <Text flex={1} fontSize="md" color="gray.700">
-                    Inscritos: {ramo.inscritos}
+                    Estado: {inscrito.estado}
                   </Text>
                   <Text flex={1} fontSize="md" color="gray.700">
-                    Estado: {ramo.estado}
+                    Paralelo: {inscrito.paralelos[0].id}
                   </Text>
-                  <Button
-                    variant="outline"
-                    color="gray.800"
-                    _hover={{ backgroundColor: "orange.300", color: "white" }}
-                    onClick={() =>
-                      handleSelectParallelInscrito(
-                        inscrito.cursoId,
-                        inscrito.paraleloId
-                      )
-                    }>
-                    Cambiar Paralelo
-                  </Button>
                   <Button
                     variant="outline"
                     color="gray.800"
                     _hover={{ backgroundColor: "red.300", color: "white" }}
-                    onClick={() => handleEliminar(inscrito.cursoId)}>
+                    onClick={() =>
+                      handleEliminar(
+                        inscrito.id,
+                        inscrito.paralelos[0].id,
+                        inscrito.inscripcion_id
+                      )
+                    }>
                     Eliminar Inscripción
                   </Button>
                 </HStack>
