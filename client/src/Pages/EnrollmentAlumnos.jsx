@@ -9,8 +9,12 @@ import {
   StackDivider,
   Select,
 } from "@chakra-ui/react";
-// import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from "../Components/Menu";
+
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getAllCursos, getAllParallelsFromCourse } from "../api/courses";
+
 import Horario from "./Horario";
+import { getInscripcionEstudiante } from "../api/enrollment";
 
 export const EnrollmentAlumnos = () => {
   // Datos ficticios de los ramos
@@ -93,6 +97,63 @@ export const EnrollmentAlumnos = () => {
       ],
     },
   ]);
+
+  //STUDENT_ID sacado de la sesion
+  const [student_id, setStudent_id] = useState(10);
+
+  const inscripcionesEstudianteQuery = useQuery({
+    queryKey: ["inscripciones_estudiante", student_id],
+    queryFn: () => {
+      //course_id, parallel_id, is_active
+      let inscripciones = getInscripcionEstudiante(student_id);
+      let cursos_inscritos = cursosQuery.data
+        .filter((curso) =>
+          inscripciones.some((inscripcion) => inscripcion.course_id == curso.id)
+        )
+        .map((curso) => {
+          const los_cursos = inscripciones.filter(
+            (inscripcion) => inscripcion.course_id === curso.id
+          );
+          const paralelosFiltrados = curso.paralelos.filter((paralelo) =>
+            los_cursos.some(
+              (inscripcion) => inscripcion.parallel_id === paralelo.id
+            )
+          );
+
+          const isActive = los_cursos[0]?.is_active;
+
+          return { ...curso, paralelos: paralelosFiltrados, estado: isActive };
+        });
+      return cursos_inscritos;
+    },
+  });
+
+  const cursosQuery = useQuery({
+    queryKey: ["courses"],
+    queryFn: getAllCursos,
+  });
+
+  const paralelosQuery = useQuery({
+    queryKey: ["prallels"],
+    queryFn: () => {
+      cursosQuery.data.map((value, index) => {
+        let cursos_formateados = [];
+        let paralelos = getAllParallelsFromCourse(value.id);
+        cursos_formateados = [
+          ...cursos_formateados,
+          {
+            id: value.id,
+            codigo: value.sigla,
+            creditos: value.creditos,
+            paralelos: paralelos.map((paralelo) => {
+              return { id: paralelo.id, numero: paralelo.number };
+            }),
+          },
+        ];
+        return cursos_formateados;
+      });
+    },
+  });
 
   const [ramosInscritos, setRamosInscritos] = useState([
     {
@@ -451,7 +512,9 @@ export const EnrollmentAlumnos = () => {
   const handleSelectParallel = (event) => {
     setSelectedParallels((prev) =>
       prev.map((item) =>
-        item.cursoId === event.target.curso ? { ...item, paraleloId: event.target.id } : item
+        item.cursoId === event.target.curso
+          ? { ...item, paraleloId: event.target.id }
+          : item
       )
     );
   };
@@ -491,10 +554,16 @@ export const EnrollmentAlumnos = () => {
       (h) =>
         h.curso_id === cursoId && h.paralelo_id === view_parallel[0].paraleloId
     );
-    const ramo = ramos.filter((h) => h.id === cursoId);
+    const ramo = paralelosQuery.data.filter((h) => h.id === cursoId);
 
     setVerHorariosRamo({ codigo: ramo[0].codigo, ...horario[0] });
   };
+
+  if (cursosQuery.status === "pending") {
+    return <h1>perate</h1>;
+  } else if (cursosQuery.status == "error") {
+    return <h1>Explote Curso: {cursosQuery.error.message}</h1>;
+  }
 
   return (
     <Box>
@@ -517,7 +586,7 @@ export const EnrollmentAlumnos = () => {
             shadow="md"
             maxHeight="40vh"
             overflowY="auto">
-            {ramos.map((ramo) => (
+            {paralelosQuery.data.map((ramo) => (
               <Box key={ramo.id}>
                 <HStack spacing={4} justify="space-between" align="center">
                   <Text
@@ -533,12 +602,15 @@ export const EnrollmentAlumnos = () => {
                   <Text flex={1} fontSize="md" color="gray.700">
                     Inscritos: {ramo.inscritos}
                   </Text>
-                  <Select
-                    onChange={handleSelectParallel}>
+                  <Select onChange={handleSelectParallel}>
                     {ramo.paralelos.map((paralelo) => (
                       <option
                         key={paralelo.id}
-                        value={{numero: paralelo.numero, id:paralelo.id, curso: ramo.id}}
+                        value={{
+                          numero: paralelo.numero,
+                          id: paralelo.id,
+                          curso: ramo.id,
+                        }}
                         color="gray.800"
                         backgroundColor="gray.100"
                         _hover={{
@@ -601,7 +673,7 @@ export const EnrollmentAlumnos = () => {
           maxHeight="35vh"
           overflowY="auto">
           {selectedParallelsInscrito.map((inscrito) => {
-            const ramo = ramosInscritos.find(
+            const ramo = inscripcionesEstudianteQuery.data.find(
               (ramo) => ramo.id === inscrito.cursoId
             );
             return (

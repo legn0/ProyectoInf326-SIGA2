@@ -1,6 +1,6 @@
 import axios from "axios";
 
-apiUrlEnrollment = "http://174.138.124.76/enrollment/api/v1/courses/";
+const apiUrlEnrollment = "http://174.138.124.76/enrollment/api/v1/courses/";
 
 export function inscribirEstudiante({ course_id, parallel_id, estudiante }) {
   return axios
@@ -25,8 +25,25 @@ export function getInscripcion({ course_id, parallel_id, enrollment_id }) {
     .then((res) => res.data);
 }
 
+
+export function getInscripcionEstudiante({student_id }) {
+  return axios
+    .get(
+      `${apiUrlEnrollment}enrollment/${student_id}`
+    )
+    .then((res) => res.data);
+}
+
 export function getAllInscripcionesFromParalelo({ course_id, parallel_id }) {
   return axios
     .get(`${apiUrlEnrollment}${course_id}/parallels/${parallel_id}/enrollment/`)
+    .then((res) => res.data);
+}
+
+export function startEnrollmentRound({course_id, parallel_id}) {
+  return axios
+    .post(
+      `${apiUrlEnrollment}${course_id}/parallels/${parallel_id}/enrollment/round`
+    )
     .then((res) => res.data);
 }

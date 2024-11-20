@@ -71,9 +71,9 @@ def create_enrollment(course_id: int, parallel_id: int, enrollment_request: Enro
     """
     crud = EnrollmentCRUD(db)
     # Verificar si existe el curso y paralelo
-    existing_course_parallel = crud.get_course_and_parallel(course_id, parallel_id)
-    if not existing_course_parallel:
-        raise HTTPException(status_code=400, detail="El curso y/o paralelo no existe")
+    # existing_course_parallel = crud.get_course_and_parallel(course_id, parallel_id)
+    # if not existing_course_parallel:
+    #     raise HTTPException(status_code=400, detail="El curso y/o paralelo no existe")
     # Crear la inscripción
      # Verificar si el estudiante ya está inscrito en el curso y paralelo
     existing_enrollment = crud.get_enrollment_by_student_and_course(enrollment_request.student_id, course_id, parallel_id)

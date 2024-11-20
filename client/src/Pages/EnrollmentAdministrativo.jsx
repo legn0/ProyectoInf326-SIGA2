@@ -1,10 +1,38 @@
-import React from "react";
-import { Box, Button, Heading, Flex, HStack } from "@chakra-ui/react";
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Heading,
+  Flex,
+  HStack,
+  FormLabel,
+  NumberInput,
+  NumberInputField,
+  FormControl,
+} from "@chakra-ui/react";
+import { useMutation } from "@tanstack/react-query";
+import { startEnrollmentRound } from "../api/enrollment";
 
-const EnrollmentAdministrativo = ({ isAlumnosEnabled, setIsAlumnosEnabled }) => {
-  const handleInitRound = () => {
-    fetch("")
-      .catch((error) => console.error("Error en la llamada a la API:", error));
+const EnrollmentAdministrativo = () => {
+  const [paraleloID, setParaleloID] = useState();
+  const [cursoID, setCursoID] = useState();
+
+  const handleParaleloIDChange = (e) => {
+    setParaleloID(e.target.value);
+  };
+
+  const handleCursoIDChange = (e) => {
+    setCursoID(e.target.value);
+  };
+
+  const iniciarRonda = useMutation({
+    mutationFn: startEnrollmentRound,
+    onError: () => console.log("No pude iniciar la ronda"), //asdasd
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    iniciarRonda.mutate(cursoID, paraleloID);
   };
 
   return (
@@ -13,28 +41,44 @@ const EnrollmentAdministrativo = ({ isAlumnosEnabled, setIsAlumnosEnabled }) => 
         Control Administrativo
       </Heading>
 
-      <Flex direction="column" justifyContent="center" alignItems="center" minHeight="70vh">
-        <Box p={6} width="40%" bg="white" shadow="md" mb={20} borderRadius="md" mx={4} textAlign="center" >
-          <Heading mb={4} color="gray.800" size="md">
-            Control de Inscripción
-          </Heading>
-          <HStack spacing={4} justify="center">
-            <Button variant="outline" color="gray.800" _hover={{ backgroundColor: "green.300", color: "white" }} onClick={() => setIsAlumnosEnabled(true)}>
-              Habilitar Inscripción
-            </Button>
-            <Button variant="outline" color="gray.800" _hover={{ backgroundColor: "red.300", color: "white" }} onClick={() => setIsAlumnosEnabled(false)}>
-              Deshabilitar Inscripción
-            </Button>
-          </HStack>
-        </Box>
-        <Box p={6} bg="white" shadow="md" borderRadius="md" mx={4} textAlign="center" width="40%">
+      <Flex
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="70vh">
+        <Box
+          p={6}
+          bg="white"
+          shadow="md"
+          borderRadius="md"
+          mx={4}
+          textAlign="center"
+          width="40%">
           <Heading mb={4} color="gray.800" size="md">
             Acciones Adicionales
           </Heading>
           <HStack spacing={4} justify="center">
-            <Button variant="outline" color="gray.800" _hover={{ backgroundColor: "orange.300", color: "white" }} onClick={handleInitRound}>
-              Iniciar Ronda de Inscripción
-            </Button>
+            <Flex direction={"column"}>
+              <FormControl>
+                <FormLabel>ID de curso:</FormLabel>
+                <NumberInput>
+                  <NumberInputField onChange={handleCursoIDChange} />
+                </NumberInput>
+              </FormControl>
+              <FormControl>
+                <FormLabel>ID de paralelo:</FormLabel>
+                <NumberInput>
+                  <NumberInputField onChange={handleParaleloIDChange} />
+                </NumberInput>
+              </FormControl>
+              <Button
+                variant="outline"
+                color="gray.800"
+                _hover={{ backgroundColor: "orange.300", color: "white" }}
+                onClick={handleSubmit}>
+                Iniciar Ronda de Inscripción
+              </Button>
+            </Flex>
           </HStack>
         </Box>
       </Flex>

@@ -7,7 +7,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { createCurso, getAllCursos } from "../api/courses";
 
 export const VistaCursos = () => {
-  const isAdmin = true;
+  const isAdmin = false;
   const horarioDisclosure = useDisclosure(false);
   const [selectedBlockId, setSelectedBlockID] = useState();
   const [horarioFiltrado, setHorarioFiltrado] = useState([]);
