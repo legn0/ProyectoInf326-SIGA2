@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: courses-client-app
+spec:
+  replicas: 1
+  selector:
+    matchLables: courses-client-app
+  template:
+    metadata:
+      labels:
+        app: courses-client-app
+    spec:
+      containers:
+      - name: courses-client-container
+        image: ttl.sh/courses-client-img:8h
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 80 
