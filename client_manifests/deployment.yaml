@@ -5,7 +5,8 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLables: courses-client-app
+    matchLabels: 
+      app: courses-client-app
   template:
     metadata:
       labels:

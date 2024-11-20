@@ -15,12 +15,12 @@ app = FastAPI()
 # async def shutdown_event():
 #     close_rabbit_connection()
 
-# app.add_middleware(CORSMiddleware,
-#                    allow_origins=["*"],
-#                    allow_credentials=True,
-#                    allow_methods=["*"],
-#                    allow_headers=["*"]
-#                    )
+app.add_middleware(CORSMiddleware,
+                   allow_origins=["*"],
+                   allow_credentials=True,
+                   allow_methods=["*"],
+                   allow_headers=["*"]
+                   )
 
 coursesModel.Base.metadata.create_all(bind=engine)
 parallelsModel.Base.metadata.create_all(bind=engine)
