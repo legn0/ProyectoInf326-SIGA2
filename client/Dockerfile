@@ -1,4 +1,4 @@
-FROM node:alpine AS build
+FROM node:20.11.0 AS build
 
 WORKDIR /client
 
@@ -12,4 +12,4 @@ RUN npm run build
 
 FROM nginx
 
-COPY --from=build /client/dist /usr/share/nginx/html
+COPY --from=build /client/build /usr/share/nginx/html
