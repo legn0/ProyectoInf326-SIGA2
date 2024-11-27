@@ -4,15 +4,14 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 
-# SQLALCHEMY_DATABASE_URL = "mysql+pymysql://myuser:mypassword@db:3306/enrollment_db"
+DATABASE_URL = os.getenv("DATABASE_URL")
 SQL_DB = os.getenv("MYSQL_DATABASE")
 SQL_USER = os.getenv("MYSQL_USER")
 SQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
 SQL_PORT = os.getenv("MYSQL_PORT")
 SQL_IP = os.getenv("SQLALCHEMY_DATABASE_URL")
 
-SQL_URL = f"mysql+pymysql://{SQL_USER}:{SQL_PASSWORD}@{SQL_IP}:{SQL_PORT}/{SQL_DB}"
-
+SQL_URL = f"{DATABASE_URL}"
 
 engine = create_engine(SQL_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
