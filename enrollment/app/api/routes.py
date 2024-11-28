@@ -57,7 +57,7 @@ def list_enrollments(course_id: int, parallel_id: int, db: Session = Depends(get
     - **parallel_id**: ID of the parallel
     """
     crud = EnrollmentCRUD(db)
-    return crud.list_enrollments(course_id, parallel_id)
+    return crud.list_all_enrollments(course_id, parallel_id)
 
 # Crear una nueva inscripción
 @router.post("/api/v1/courses/{course_id}/parallels/{parallel_id}/enrollments", response_model=Enrollment, summary="Create a New Enrollment", description="Create a new enrollment for a course and parallel. The student must not be already enrolled.")

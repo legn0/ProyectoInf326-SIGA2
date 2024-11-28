@@ -9,7 +9,7 @@ class TestCreateEnrollment(unittest.TestCase):
     def setUp(self) :
         if self._testMethodName == 'test_create_enrollment_duplicate':
             response = requests.post(
-                f"{BASE_URL}/api/v1/courses/201/parallels/4/enrollments",
+                f"{BASE_URL}/api/v1/courses/203/parallels/4/enrollments",
                 json={"student_id": 1},
             )
 
@@ -33,7 +33,7 @@ class TestCreateEnrollment(unittest.TestCase):
     def test_create_enrollment_success(self):
         # Send the request
         response = requests.post(
-            f"{BASE_URL}/api/v1/courses/201/parallels/4/enrollments",
+            f"{BASE_URL}/api/v1/courses/203/parallels/4/enrollments",
             json={"student_id": 1},
         )
 

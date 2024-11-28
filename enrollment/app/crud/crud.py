@@ -14,7 +14,10 @@ class EnrollmentCRUD:
                 Enrollment_model.id == enrollment_id,
                 Enrollment_model.course_id == course_id,
                 Enrollment_model.parallel_id == parallel_id,
-                Enrollment_model.is_active == "Inscrita"
+                or_(
+                Enrollment_model.is_active == "Inscrita",
+                Enrollment_model.is_active == "Pendiente"
+                )
             )
             .first()
         )
@@ -26,6 +29,20 @@ class EnrollmentCRUD:
                 Enrollment_model.course_id == course_id,
                 Enrollment_model.parallel_id == parallel_id,
                 Enrollment_model.is_active == "Inscrita"
+            )
+            .all()
+        )
+    
+    def list_all_enrollments(self, course_id: int, parallel_id: int):
+        return (
+            self.db.query(Enrollment_model)
+            .filter(
+                Enrollment_model.course_id == course_id,
+                Enrollment_model.parallel_id == parallel_id,
+                or_(
+                Enrollment_model.is_active == "Inscrita",
+                Enrollment_model.is_active == "Pendiente"
+                )
             )
             .all()
         )
